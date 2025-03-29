@@ -1,1 +1,1 @@
-The goal of this Repository is to put all the random and not some random coding projects I come up with. As you can see it is currently bare, except for one which I will attempt to do with a team. A team like no before.
+The goal of this Repository is to put all the random and not some random coding projects I come up with. As you can see it is currently bare, except for one which I will attempt to do with a team. A team like no before. *Dies of cringe*
