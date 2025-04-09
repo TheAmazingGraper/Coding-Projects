@@ -6,7 +6,34 @@ using namespace std;
 
 int main()
 {
-    cout << "Hello World!\n" <<endl;
+    cout << "Press q to quit!\n" <<endl;
+
+    bool quit = false;
+    
+    
+    string input;
+    int loop = 0;
+
+
+
+    // Main while loop where game jigsaw will play.
+    while (!quit) {
+
+        cin >> input;
+
+        if (input == "q")
+            quit = true;
+
+        if (quit)
+            cout << "Quit: True." << endl;
+        else
+            cout << "Quit: False." << endl;
+
+        loop++;
+        cout << "Loop: " << loop << endl;
+    }
+
+    cout << "Exiting program." << endl;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
