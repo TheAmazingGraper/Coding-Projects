@@ -1,9 +1,10 @@
 // Jigsaw Puzzle.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+// Due Date May 14.
 
 using namespace std;
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 
 int main(){
 
@@ -45,11 +46,11 @@ int main(){
 
     cout << "Manipulating Angles" << endl;
 
-    cout << "Angle1: " << angle1.asDegrees() << endl;
-    cout << "Angle1: " << angle1.asRadians() << endl;
+    cout << "Angle1: " << angle1.asDegrees() << " degrees" << endl;
+    cout << "Angle1: " << angle1.asRadians() << " radians" << endl;
 
-    cout << "Angle2: " << angle2.asDegrees() << endl;
-    cout << "Angle2: " << angle2.asRadians() << endl;
+    cout << "Angle2: " << angle2.asDegrees() << " degrees" << endl;
+    cout << "Angle2: " << angle2.asRadians() << " radians" << endl;
 
     cout << "Is Angle1 = Angle2 : " << equal << endl;
     cout << "Is Angle1 = Angle2 : " << inequal << endl;
@@ -108,12 +109,79 @@ int main(){
 
     //Using an input stream
 
-    sf::FileInputStream stream("Grapes.png");
+    sf::FileInputStream stream("Grapes.png"); // I'm using this for a test texture. Maybe...
     sf::Texture texture(stream);
 
     //-------------------------------------------------
     // Attempting to open another window with the Grapes.png
     //-------------------------------------------------
+
+    sf::Texture texture2("Grapes.png");
+    sf::Sprite sprite(texture2);
+
+    cout << "\nOpening a new window" << endl;
+    cout << "When 10 seconds has pass the window will change." << endl;
+
+    sf::RenderWindow window2(sf::VideoMode({ 800, 600 }), "Orignal window");
+   
+    clock.restart();
+    sf::Time elapsed5 = clock.getElapsedTime();
+
+    // run the program as long as the window is open
+    while (window2.isOpen()){
+    
+        elapsed5 = clock.getElapsedTime();
+
+        if (elapsed5.asSeconds() > 10) {
+            // change the position of the window (relatively to the desktop)
+            window2.setPosition({ 10, 50 });
+
+            // change the size of the window
+            window2.setSize({ 640, 480 });
+
+            // change the title of the window
+            window2.setTitle("New SFML window");
+
+            // get the size of the window
+            sf::Vector2u size = window2.getSize();
+            auto [width, height] = size;
+
+            // check whether the window has the focus
+            bool focus = window.hasFocus();
+        }
+
+        // check all the window's events that were triggered since the last iteration of the loop
+        while (const std::optional event = window2.pollEvent()){
+        
+            // "close requested" event: we close the window
+            if (event->is<sf::Event::Closed>())
+                window2.close();
+
+            // Whenever a key is press trigger this event.
+            if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
+                if (keyPressed->scancode == sf::Keyboard::Scan::Escape)
+                {
+                    std::cout << "the escape key was pressed" << std::endl;
+                    std::cout << "scancode: " << static_cast<int>(keyPressed->scancode) << std::endl;
+                    std::cout << "code: " << static_cast<int>(keyPressed->code) << std::endl;
+                    std::cout << "control: " << keyPressed->control << std::endl;
+                    std::cout << "alt: " << keyPressed->alt << std::endl;
+                    std::cout << "shift: " << keyPressed->shift << std::endl;
+                    std::cout << "system: " << keyPressed->system << std::endl;
+                    std::cout << "description: " << sf::Keyboard::getDescription(keyPressed->scancode).toAnsiString() << std::endl;
+                    std::cout << "localize: " << static_cast<int>(sf::Keyboard::localize(keyPressed->scancode)) << std::endl;
+                    std::cout << "delocalize: " << static_cast<int>(sf::Keyboard::delocalize(keyPressed->code)) << std::endl;
+                }
+            }
+        }
+        
+    }
+    
+    window2.clear();
+    window2.draw(sprite);
+    window2.display();
+
 
 }
 
