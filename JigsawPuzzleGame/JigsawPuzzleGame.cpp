@@ -119,8 +119,30 @@ int main(){
     sf::Texture texture2("Grapes.png");
     sf::Sprite sprite(texture2);
 
+    sf::Font font("AGENCYR.ttf");
+    //sf::Font font;
+    sf::Text text(font); // a font is required to make a text object
+
+    // set the string to display
+    text.setString("Hello world");
+
+    // set the character size
+    text.setCharacterSize(24); // in pixels, not points!
+
+    // set the color
+    text.setFillColor(sf::Color::Red);
+
+    // set the text style
+    text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    
+
+
+        // inside the main loop, between window.clear() and window.display()
+        
+
+
     cout << "\nOpening a new window" << endl;
-    cout << "When 10 seconds has pass the window will change." << endl;
+    cout << "When 2 seconds has pass the window will change." << endl;
 
     sf::RenderWindow window2(sf::VideoMode({ 800, 600 }), "Orignal window");
    
@@ -129,10 +151,15 @@ int main(){
 
     // run the program as long as the window is open
     while (window2.isOpen()){
-    
+
+        window2.clear();
+        window2.draw(sprite);
+        window2.draw(text);
+        window2.display();
+
         elapsed5 = clock.getElapsedTime();
 
-        if (elapsed5.asSeconds() > 10) {
+        if (elapsed5.asSeconds() > 2) {
             // change the position of the window (relatively to the desktop)
             window2.setPosition({ 10, 50 });
 
@@ -148,6 +175,22 @@ int main(){
 
             // check whether the window has the focus
             bool focus = window.hasFocus();
+
+            //sprite.setTextureRect(sf::IntRect({ 10, 10 }, { 32, 32 })); //Changes the rectangle of the texture.
+            sprite.setColor(sf::Color(0, 255, 0)); // green
+            sprite.setColor(sf::Color(255, 255, 255, 128)); // half transparent
+            // position
+            sprite.setPosition({ 500.f, 50.f }); // absolute position
+            //sprite.move({ 10.f, 10.f }); // offset relative to the current position
+
+            // rotation
+            sprite.setRotation(sf::degrees(90)); // absolute angle
+            //sprite.rotate(sf::degrees(14)); // offset relative to the current angle
+
+            // scale
+            sprite.setScale({ 2.5f, 2.f }); // absolute scale factor
+            sprite.scale({ 1.5f, 1.25f }); // factor relative to the current scale
+            //sprite.setOrigin({ 30.f, 30.f });
         }
 
         // check all the window's events that were triggered since the last iteration of the loop
@@ -178,9 +221,7 @@ int main(){
         
     }
     
-    window2.clear();
-    window2.draw(sprite);
-    window2.display();
+
 
 
 }
