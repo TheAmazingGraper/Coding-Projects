@@ -117,9 +117,10 @@ int main(){
     //-------------------------------------------------
 
     sf::Texture texture2("Grapes.png");
-    sf::Sprite sprite(texture);
+    sf::Sprite sprite(texture2);
 
-    sf::Font font("Roboto-Regular.tff");
+    sf::Font font("AGENCYR.ttf");
+    //sf::Font font;
     sf::Text text(font); // a font is required to make a text object
 
     // set the string to display
@@ -133,6 +134,7 @@ int main(){
 
     // set the text style
     text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    
 
 
         // inside the main loop, between window.clear() and window.display()
@@ -178,8 +180,8 @@ int main(){
             sprite.setColor(sf::Color(0, 255, 0)); // green
             sprite.setColor(sf::Color(255, 255, 255, 128)); // half transparent
             // position
-            //sprite.setPosition({ 10.f, 50.f }); // absolute position
-            sprite.move({ 10.f, 10.f }); // offset relative to the current position
+            sprite.setPosition({ 500.f, 50.f }); // absolute position
+            //sprite.move({ 10.f, 10.f }); // offset relative to the current position
 
             // rotation
             sprite.setRotation(sf::degrees(90)); // absolute angle
@@ -188,7 +190,7 @@ int main(){
             // scale
             sprite.setScale({ 2.5f, 2.f }); // absolute scale factor
             sprite.scale({ 1.5f, 1.25f }); // factor relative to the current scale
-            //sprite.setOrigin({ 25.f, 25.f });
+            //sprite.setOrigin({ 30.f, 30.f });
         }
 
         // check all the window's events that were triggered since the last iteration of the loop
