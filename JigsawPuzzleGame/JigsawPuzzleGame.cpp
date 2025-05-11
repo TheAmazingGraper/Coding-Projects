@@ -8,6 +8,7 @@ using namespace std;
 
 int main(){
 
+    
 
     //-------------------------------------------------
     // New Window with a green circle
@@ -93,14 +94,14 @@ int main(){
     sf::Time elapsed4 = clock.getElapsedTime();
     cout << "elapsed4: " << elapsed4.asSeconds() << " seconds" << endl;
 
-    /*
-    sf::Clock clock;
-    while (window.isOpen())
-    {
-        sf::Time elapsed = clock.restart();
-        updateGame(elapsed);
-        ...
-    }*/
+    
+    //sf::Clock clock;
+    //while (window.isOpen())
+    //{
+    //    sf::Time elapsed = clock.restart();
+    //    updateGame(elapsed);
+    //    ...
+    //}
 
     //-------------------------------------------------
     // User Streams (input and output)
@@ -135,7 +136,6 @@ int main(){
     // set the text style
     text.setStyle(sf::Text::Bold | sf::Text::Underlined);
     
-
 
         // inside the main loop, between window.clear() and window.display()
         
@@ -221,99 +221,87 @@ int main(){
         
     }
     
+    
+
+    //-------------------------------------------------
+    // Writing the real code for the project here.
+    //-------------------------------------------------
 
 
 
-}
+    sf::RenderWindow MainMenu(sf::VideoMode({ 800, 600 }), "Main Menu");;
+
+    //sf::Sprite Button();
+    sf::RectangleShape Button({40,35});
+  
+    
+    sf::Font font2("AGENCYR.ttf");
+    sf::Text QuitText(font2);
+    QuitText.setString("Quit");
 
 
-/*
-using namespace std;
-#include <iostream>
-#include <SFML/Graphics.hpp>
+    sf::Vector2u WindowSize = MainMenu.getSize();
+    int WindowX = WindowSize.x;
+    int WindowY = WindowSize.y;
 
-void loopFunction(int y);
-
-
-class button {
-
-public:
-    bool pressable;
-
-};
+    float CenterX = WindowX / 2;
+    float CenterY = WindowY / 2;
+    
 
 
-int main()
-{
-    cout << "Press q to quit!\n" << endl;
 
-    bool quit = false;
+        // run the program as long as the window is open
+    while (MainMenu.isOpen()){
 
+        // get the global mouse position (relative to the desktop)
+        //sf::Vector2i globalPosition = sf::Mouse::getPosition();
 
-    string input;
-    int loop = 0;
+        // get the local mouse position (relative to a window)
+        sf::Vector2i localPosition = sf::Mouse::getPosition(MainMenu); // window is a sf::Window
+        //{localPosition.x, localPosition.y}
+       
+        if (Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) { // Button Changes to red when mouse hover.
+            Button.setFillColor(sf::Color::Red);
 
-    button a;
-    a.pressable = true;
-
-    cout << a.pressable << endl;
-
-    sf::RenderWindow window(sf::VideoMode({ 200, 200 }), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
-
-    while (window.isOpen())
-    {
-        while (const std::optional event = window.pollEvent())
-        {
-            if (event->is<sf::Event::Closed>())
-                window.close();
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                // left mouse button is pressed on top of quit button then close menu.
+                MainMenu.close();
+            }
+        }
+        else {
+            Button.setFillColor(sf::Color::Blue);
         }
 
-        window.clear();
-        window.draw(shape);
-        window.display();
-    }
+
+        Button.setPosition({ CenterX, CenterY });
+        QuitText.setPosition({ CenterX, CenterY });
+
+        MainMenu.clear();
+        MainMenu.draw(Button);
+        MainMenu.draw(QuitText);
+        MainMenu.display();
+
+        // check all the window's events that were triggered since the last iteration of the loop
+        while (const std::optional event = MainMenu.pollEvent()){
+            // "close requested" event: we close the window
+            if (event->is<sf::Event::Closed>())
+                MainMenu.close();
+         }
+
+        
 
 
 
-    // Main while loop where game jigsaw will play.
-    while (!quit) {
 
-        cin >> input;
-
-        if (input == "q")
-            quit = true;
-
-        if (quit)
-            cout << "Quit: True." << endl;
-        else
-            cout << "Quit: False." << endl;
-
-        loop++;
-        cout << "Loop: " << loop << endl;
-
-        loopFunction(loop);
-
-    }
+        }
 
 
-    cout << "Exiting program." << endl;
 }
 
 
-void loopFunction(int y) {
 
-    int x = 0;
 
-    for (int i = 0; i < y; i++) {
-        cout << "Loop: " << x << endl;
-        x++;
-    }
 
-    cout << "Loop terminated" << endl;
-
-}
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu
@@ -326,4 +314,3 @@ void loopFunction(int y) {
 //   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
 //   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
 
-*/
