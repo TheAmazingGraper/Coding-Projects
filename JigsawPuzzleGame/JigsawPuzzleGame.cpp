@@ -8,7 +8,7 @@ using namespace std;
 
 int main(){
 
-    
+    /*
 
     //-------------------------------------------------
     // New Window with a green circle
@@ -221,48 +221,54 @@ int main(){
         
     }
     
-    
+    */
 
     //-------------------------------------------------
     // Writing the real code for the project here.
     //-------------------------------------------------
 
 
-
-    sf::RenderWindow MainMenu(sf::VideoMode({ 800, 600 }), "Main Menu");;
-
-    //sf::Sprite Button();
-    sf::RectangleShape Button({40,35});
-  
+    //
+    //sf::RenderWindow MainMenu(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
+    sf::RenderWindow MainMenu(sf::VideoMode({ 800, 600 }), "Main Menu");
     
     sf::Font font2("AGENCYR.ttf");
     sf::Text QuitText(font2);
     QuitText.setString("Quit");
 
+    sf::Text FullText(font2);
+    FullText.setString("Full Screen");
 
-    sf::Vector2u WindowSize = MainMenu.getSize();
-    int WindowX = WindowSize.x;
-    int WindowY = WindowSize.y;
+    //sf::Sprite Button();
+    //sf::RectangleShape Button({ 45.f,35.f }); // Quit button
+    sf::RectangleShape Button(QuitText.getGlobalBounds().size); // Quit button
+    sf::RectangleShape FullScreenButton(FullText.getGlobalBounds().size); //Fullscreen
 
-    float CenterX = WindowX / 2;
-    float CenterY = WindowY / 2;
+
     
-
 
 
         // run the program as long as the window is open
     while (MainMenu.isOpen()){
+
+        sf::Vector2u WindowSize = MainMenu.getSize();
+        int WindowX = WindowSize.x;
+        int WindowY = WindowSize.y;
+
+        float CenterX = WindowX / 2;
+        float CenterY = WindowY / 2;
+
 
         // get the global mouse position (relative to the desktop)
         //sf::Vector2i globalPosition = sf::Mouse::getPosition();
 
         // get the local mouse position (relative to a window)
         sf::Vector2i localPosition = sf::Mouse::getPosition(MainMenu); // window is a sf::Window
-        //{localPosition.x, localPosition.y}
        
-        if (Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) { // Button Changes to red when mouse hover.
-            Button.setFillColor(sf::Color::Red);
 
+        // Quit Button Changes to red when mouse hover.
+        if (Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) { 
+            Button.setFillColor(sf::Color::Red);
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                 // left mouse button is pressed on top of quit button then close menu.
                 MainMenu.close();
@@ -272,13 +278,29 @@ int main(){
             Button.setFillColor(sf::Color::Blue);
         }
 
+        // FullScreen Button Changes to red when mouse hover.
+        if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) { 
+            FullScreenButton.setFillColor(sf::Color::Red);
+
+            // left mouse button is pressed on top of FullScreen button then close menu.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                MainMenu.create(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
+            }
+        }
+        else {
+            FullScreenButton.setFillColor(sf::Color::Blue);
+            //MainMenu.setSize({ 800, 600 });
+        }
 
         Button.setPosition({ CenterX, CenterY });
         QuitText.setPosition({ CenterX, CenterY });
 
+        //Order matters when drawing objects.
         MainMenu.clear();
         MainMenu.draw(Button);
         MainMenu.draw(QuitText);
+        MainMenu.draw(FullScreenButton);
+        MainMenu.draw(FullText);
         MainMenu.display();
 
         // check all the window's events that were triggered since the last iteration of the loop
@@ -289,11 +311,7 @@ int main(){
          }
 
         
-
-
-
-
-        }
+    }
 
 
 }
