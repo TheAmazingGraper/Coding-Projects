@@ -8,7 +8,7 @@ using namespace std;
 
 int main(){
 
-    
+    /*
 
     //-------------------------------------------------
     // New Window with a green circle
@@ -221,79 +221,164 @@ int main(){
         
     }
     
-    
+    */
 
     //-------------------------------------------------
     // Writing the real code for the project here.
     //-------------------------------------------------
 
 
-
-    sf::RenderWindow MainMenu(sf::VideoMode({ 800, 600 }), "Main Menu");;
-
-    //sf::Sprite Button();
-    sf::RectangleShape Button({40,35});
-  
+    //
+    //sf::RenderWindow MainMenu(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
+    sf::RenderWindow MainMenu(sf::VideoMode({ 800, 600 }), "Main Menu");
     
-    sf::Font font2("AGENCYR.ttf");
+    sf::Font font("AGENCYR.ttf");
+    sf::Font font2("AGENCYB.ttf");
+
     sf::Text QuitText(font2);
     QuitText.setString("Quit");
 
+    sf::Text FullScreenText(font);
+    FullScreenText.setString("Full Screen");
 
-    sf::Vector2u WindowSize = MainMenu.getSize();
-    int WindowX = WindowSize.x;
-    int WindowY = WindowSize.y;
+    sf::Text VolumeText(font);
+    VolumeText.setString("100");
 
-    float CenterX = WindowX / 2;
-    float CenterY = WindowY / 2;
+    sf::Texture GrapeTexture("Grapes.png");
+    sf::Sprite Grape(GrapeTexture);
+    Grape.setColor(sf::Color::Blue);
+
+    sf::Texture SpeakerTexture("Speaker.png");
+    sf::Sprite Speaker(SpeakerTexture);
+    Speaker.setColor(sf::Color::White);
+    Speaker.setScale({ 0.25, 0.25 });
+
+
+    //Buttons
+    //sf::RectangleShape QuitButton({ 45.f,35.f }); // Quit button
+    sf::RectangleShape QuitButton(QuitText.getGlobalBounds().size); // Quit button
+    sf::RectangleShape FullScreenButton(FullScreenText.getGlobalBounds().size); //Fullscreen
+    sf::RectangleShape SoundBar({ 300, 20 }); //SoundBar is 300 pixel long.
+    sf::RectangleShape SoundBar2({ 300, 20 });
+    SoundBar.setFillColor(sf::Color::Green);
+    SoundBar2.setFillColor(sf::Color::White);
+
+    sf::CircleShape SoundCircle(10, 20);
+    SoundCircle.setFillColor(sf::Color::White);
     
 
 
-
         // run the program as long as the window is open
-    while (MainMenu.isOpen()){
+    while (MainMenu.isOpen()) {
 
-        // get the global mouse position (relative to the desktop)
-        //sf::Vector2i globalPosition = sf::Mouse::getPosition();
+
+
+
+        sf::Vector2u WindowSize = MainMenu.getSize();
+        int WindowX = WindowSize.x;
+        int WindowY = WindowSize.y;
+
+        float CenterX = WindowX / 2;
+        float CenterY = WindowY / 2;
+
 
         // get the local mouse position (relative to a window)
         sf::Vector2i localPosition = sf::Mouse::getPosition(MainMenu); // window is a sf::Window
-        //{localPosition.x, localPosition.y}
-       
-        if (Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) { // Button Changes to red when mouse hover.
-            Button.setFillColor(sf::Color::Red);
 
+
+        // Quit Button Changes to red when mouse hover.
+        if (QuitButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            QuitButton.setFillColor(sf::Color::Red);
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                 // left mouse button is pressed on top of quit button then close menu.
                 MainMenu.close();
             }
         }
         else {
-            Button.setFillColor(sf::Color::Blue);
+            QuitButton.setFillColor(sf::Color::Blue);
+        }
+
+        // FullScreen Button Changes to red when mouse hover.
+        if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            FullScreenButton.setFillColor(sf::Color::Red);
+
+            // left mouse button is pressed on top of FullScreen button then close menu.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                MainMenu.create(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
+            }
+        }
+        else {
+            FullScreenButton.setFillColor(sf::Color::Blue);
+        }
+
+        // SoundBar  Changes to red when mouse hover.
+        if (SoundBar.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            //SoundBar.setFillColor(sf::Color::Red);
+            SoundCircle.setPosition({ (float)localPosition.x-10, SoundBar.getPosition().y });
+            SoundCircle.setFillColor(sf::Color::White);
+            MainMenu.draw(SoundCircle);
+
+            // left mouse button is pressed on SoundCircle to adjust volume.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                //Code here to change the sound
+                //SoundBar.setSize();
+                SoundBar.setSize(sf::Vector2f(SoundCircle.getPosition().x - SoundBar.getPosition().x / 2, SoundBar2.getPosition().y));
+            }
+
+        }
+        else {
+            SoundBar.setFillColor(sf::Color::Green);
+            SoundCircle.setFillColor(sf::Color::Green);
+            
         }
 
 
-        Button.setPosition({ CenterX, CenterY });
-        QuitText.setPosition({ CenterX, CenterY });
 
-        MainMenu.clear();
-        MainMenu.draw(Button);
-        MainMenu.draw(QuitText);
-        MainMenu.display();
 
         // check all the window's events that were triggered since the last iteration of the loop
-        while (const std::optional event = MainMenu.pollEvent()){
+        while (const std::optional event = MainMenu.pollEvent()) {
             // "close requested" event: we close the window
             if (event->is<sf::Event::Closed>())
                 MainMenu.close();
-         }
+        }
 
+
+        //Position of the Text,Buttons, and Sprites.
+        sf::Transform transform = Speaker.getTransform();
+
+        // 2. Define the relative position
+        sf::Vector2f relativePosition(300, 90);
+
+        // 3. Apply the transformation to the relative position
+        sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
+
+        // 4. Move sprite1 to the transformed position
+        SoundBar2.setPosition(transformedPosition);
+        SoundBar.setPosition(transformedPosition);
+
+        VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50});
+        Speaker.setPosition({ CenterX - 200, CenterY - 100 });
+        QuitButton.setPosition({ CenterX, CenterY });
+        QuitText.setPosition({ CenterX, CenterY });
         
 
 
+        //Order matters when drawing objects.
+        MainMenu.clear();
+        MainMenu.draw(QuitButton);
+        MainMenu.draw(QuitText);
+        MainMenu.draw(FullScreenButton);
+        MainMenu.draw(FullScreenText);
+        MainMenu.draw(Speaker);
+        MainMenu.draw(SoundBar2);
+        MainMenu.draw(SoundBar);
+        MainMenu.draw(VolumeText);
+        MainMenu.draw(SoundCircle);
+        //MainMenu.draw(Grape);
+        MainMenu.display();
 
-
-        }
+        
+    }
 
 
 }
