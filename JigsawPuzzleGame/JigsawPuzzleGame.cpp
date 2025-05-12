@@ -242,7 +242,6 @@ int main(){
     FullScreenText.setString("Full Screen");
 
     sf::Text VolumeText(font);
-    VolumeText.setString("100");
 
     sf::Texture GrapeTexture("Grapes.png");
     sf::Sprite Grape(GrapeTexture);
@@ -311,8 +310,9 @@ int main(){
             FullScreenButton.setFillColor(sf::Color::Blue);
         }
 
-        // SoundBar  Changes to red when mouse hover.
-        if (SoundBar.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+        // SoundBar  Changes to red when mouse hover ove the global bounds of SoundBar2.
+        //I have to use the SoundBar2 for the global bounds, since SoundBar changes.
+        if (SoundBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
             //SoundBar.setFillColor(sf::Color::Red);
             SoundCircle.setPosition({ (float)localPosition.x-10, SoundBar.getPosition().y });
             SoundCircle.setFillColor(sf::Color::White);
@@ -322,7 +322,14 @@ int main(){
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                 //Code here to change the sound
                 //SoundBar.setSize();
-                SoundBar.setSize(sf::Vector2f(SoundCircle.getPosition().x - SoundBar.getPosition().x / 2, SoundBar2.getPosition().y));
+                
+                //Stop sound circle from going below the SoundBar position x.
+                if (SoundCircle.getPosition().x < SoundBar.getPosition().x)
+                    SoundCircle.setPosition(SoundBar.getPosition());
+
+                SoundBar.setSize({ (localPosition.x-SoundBar.getPosition().x ), SoundBar.getSize().y});
+                
+                
             }
 
         }
@@ -362,6 +369,10 @@ int main(){
         QuitText.setPosition({ CenterX, CenterY });
         
 
+        string VolumeString = to_string((int)SoundBar.getSize().x/3); // Convert the float into an int, then that int into a string.
+        VolumeText.setString(VolumeString);
+
+        
 
         //Order matters when drawing objects.
         MainMenu.clear();
