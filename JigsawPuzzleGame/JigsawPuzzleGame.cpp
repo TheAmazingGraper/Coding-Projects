@@ -419,6 +419,17 @@ int main(){
         string MusicVolumeString = to_string(MusicVolume);
         MusicVolumeText.setString(MusicVolumeString);
 
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Drawing/Displaying the objects onto the Game Window.
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        PlayButton.setPosition({ OptionsButton.getPosition().x, OptionsButton.getPosition().y - 50 });
+        PlayText.setPosition(PlayButton.getPosition());
+
+        OptionsButton.setPosition({ QuitButton.getPosition().x, QuitButton.getPosition().y - 50 });
+        OptionsText.setPosition(OptionsButton.getPosition());
+
+        QuitButton.setPosition({ CenterX, CenterY });
+        QuitText.setPosition({ CenterX, CenterY });
         //Order matters when drawing objects.
         Game.clear();
 
