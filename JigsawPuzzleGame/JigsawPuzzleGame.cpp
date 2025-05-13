@@ -48,6 +48,11 @@ int main(){
     sf::Text PlayText(font);
     PlayText.setString("Play");
 
+    sf::Text ReturnText(font);
+    ReturnText.setString("Return");
+
+    sf::Text MainMenuText(font);
+    MainMenuText.setString("Main Menu");
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
@@ -56,18 +61,17 @@ int main(){
     //sf::Sprite Grape(GrapeTexture);
     //Grape.setColor(sf::Color::Blue);
 
-    //Speaker Sprite and texture.
+    // Sprite and texture.
     sf::Texture SpeakerTexture("Speaker.png");
     sf::Sprite Speaker(SpeakerTexture);
     Speaker.setColor(sf::Color::White);
     Speaker.setScale({ 0.25, 0.25 });
 
-    //Music Sprite and texture.
+    // Music Sprite and texture.
     sf::Texture MusicTexture("TrebleClefBlack.png");
     sf::Sprite MusicSymbol(MusicTexture);
     MusicSymbol.setColor(sf::Color::White);
     MusicSymbol.setScale({ 0.25, 0.25 });
-
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Buttons
@@ -81,6 +85,8 @@ int main(){
     sf::RectangleShape MusicBar2(MusicBar.getSize());
     sf::RectangleShape OptionsButton(OptionsText.getGlobalBounds().size);
     sf::RectangleShape PlayButton(PlayText.getGlobalBounds().size);
+    sf::RectangleShape ReturnButton(ReturnText.getGlobalBounds().size);
+    sf::RectangleShape MainMenuButton(MainMenuText.getGlobalBounds().size);
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -131,17 +137,23 @@ int main(){
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
-    // Windows types
+    // Windows types and screens
     //------------------------------------------------------------------------------------------------------------------------------------------    
-    bool isMainMenu = true;
-    bool isOptions = false;
-    bool isPlay = false;
+    bool isMainMenu = true; // Screen = 0
+    bool isOptions = false; // Screen = 1
+    bool isPlay = false; // Screen = 2
+
+    int Screen = 0;
+
+    // Get the Previous screen value for the returnButton.
+    int PreviousScreen = Screen;
+
+    sf::Text PreviousText(font);
 
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
-
         // Volumes of both sound and music. (also convert the float into int)
-        int Volume = (int)SoundBar.getSize().x / 3; 
+        int Volume = (int)SoundBar.getSize().x / 3;
         int MusicVolume = (int)MusicBar.getSize().x / 3;
 
         // Finding the Game window size.
@@ -153,14 +165,14 @@ int main(){
         float CenterX = WindowX / 2;
         float CenterY = WindowY / 2;
 
-
         // Get the local mouse position (relative to the Game window).
-        sf::Vector2i localPosition = sf::Mouse::getPosition(Game); 
+        sf::Vector2i localPosition = sf::Mouse::getPosition(Game);
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Press button only when it is the Main Menu.
         //------------------------------------------------------------------------------------------------------------------------------------------ 
         if (isMainMenu) {
+            Screen = 0;
 
             // PlayButton Changes to red when mouse hover.
             if (PlayButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
@@ -172,6 +184,7 @@ int main(){
                     isOptions = false;
                     isPlay = true;
                     Game.create(sf::VideoMode(Game.getSize()), "Play");
+                    PreviousScreen = Screen;
                 }
             }
             else {
@@ -188,6 +201,7 @@ int main(){
                     isOptions = true;
                     isPlay = false;
                     Game.create(sf::VideoMode(Game.getSize()), "Options");
+                    PreviousScreen = Screen;
                 }
             }
             else {
@@ -200,9 +214,9 @@ int main(){
 
                 // Left click to quit Game window.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    
+
                     // Add GameSave code here...
-                    
+
                     Game.close();
                 }
             }
@@ -215,6 +229,7 @@ int main(){
         // Press button only when it is Play.
         //------------------------------------------------------------------------------------------------------------------------------------------ 
         if (isPlay) {
+            Screen = 2;
 
             // Puzzle Changes to red when mouse hover.
             if (Puzzle.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
@@ -261,12 +276,74 @@ int main(){
             else {
                 Puzzle.setFillColor(sf::Color::Blue);
             }
+
+            // OptionsButton Changes to red when mouse hover.
+            if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                OptionsButton.setFillColor(sf::Color::Red);
+
+                // Left click changes window to Options window.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    isMainMenu = false;
+                    isOptions = true;
+                    isPlay = false;
+                    Game.create(sf::VideoMode(Game.getSize()), "Options");
+                    PreviousScreen = Screen;
+                }
+            }
+            else {
+                OptionsButton.setFillColor(sf::Color::Blue);
+            }
+
+            // ReturnButton Button Changes to red when mouse hover.
+            if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                ReturnButton.setFillColor(sf::Color::Red);
+
+                // Left click to activate ReturnButton.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    if (PreviousScreen == 0) {
+                        Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
+                        isMainMenu = true;
+                        isOptions = false;
+                        isPlay = false;
+                        PreviousScreen = Screen;
+                    }
+
+                    if (PreviousScreen == 2) {
+                        Game.create(sf::VideoMode(Game.getSize()), "Play");
+                        isMainMenu = false;
+                        isOptions = false;
+                        isPlay = true;
+                        PreviousScreen = Screen;
+                    }
+                }
+            }
+            else {
+                ReturnButton.setFillColor(sf::Color::Blue);
+            }
+
+            // MainMenuButton Changes to red when mouse hover.
+            if (MainMenuButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                MainMenuButton.setFillColor(sf::Color::Red);
+
+                // Left click to play test sound.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
+                        isMainMenu = true;
+                        isOptions = false;
+                        isPlay = false;
+                }
+            }
+            else {
+                MainMenuButton.setFillColor(sf::Color::Blue);
+            }
+
         }
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Press button only when it is the Options.
         //------------------------------------------------------------------------------------------------------------------------------------------ 
         if (isOptions) {
+            Screen = 1;
 
             // FullScreen Button Changes to red when mouse hover.
             if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
@@ -293,10 +370,10 @@ int main(){
                     // Stop sound circle from going below the SoundBar position x.
                     if (SoundCircle.getPosition().x < SoundBar.getPosition().x)
                         SoundCircle.setPosition(SoundBar.getPosition());
-                    
+
                     // Changes the SoundBar based on the position of the Mouse.
                     SoundBar.setSize({ (localPosition.x - SoundBar.getPosition().x), SoundBar.getSize().y });
-                   
+
                     // Set the volume of sound.
                     sound.setVolume(Volume);
                 }
@@ -331,10 +408,10 @@ int main(){
                     //Stop sound circle from going below the SoundBar position x.
                     if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
                         SoundCircle2.setPosition(MusicBar.getPosition());
-                    
+
                     // Changes the MusicBar based on the position of the Mouse. 
                     MusicBar.setSize({ (localPosition.x - MusicBar.getPosition().x), MusicBar.getSize().y });
-                    
+
                     // Set the volume of music.
                     music.setVolume(MusicVolume);
                 }
@@ -344,6 +421,33 @@ int main(){
                 MusicBar.setFillColor(sf::Color::Green);
                 SoundCircle2.setFillColor(sf::Color::Green);
             }
+
+            // ReturnButton Button Changes to red when mouse hover.
+            if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                ReturnButton.setFillColor(sf::Color::Red);
+
+                // Left click to activate ReturnButton.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    if (PreviousScreen == 0) {
+                        Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
+                        isMainMenu = true;
+                        isOptions = false;
+                        isPlay = false;
+                        PreviousScreen = Screen;
+                    }
+
+                    if (PreviousScreen == 2) {
+                        Game.create(sf::VideoMode(Game.getSize()), "Play");
+                        isMainMenu = false;
+                        isOptions = false;
+                        isPlay = true;
+                        PreviousScreen = Screen;
+                    }
+                }
+            }
+            else {
+                ReturnButton.setFillColor(sf::Color::Blue);
+            }
         }
 
 
@@ -351,7 +455,7 @@ int main(){
         while (const std::optional event = Game.pollEvent()) {
             // "close requested" event: we close the window
             if (event->is<sf::Event::Closed>()) {
-                
+
                 // Add GameSave code here...
 
                 Game.close();
@@ -378,9 +482,11 @@ int main(){
         PuzzleText.setPosition(Puzzle.getPosition());
         PuzzleText.setRotation(Puzzle.getRotation());
 
+        MainMenuText.setPosition({ 0, 0 });
+        MainMenuButton.setPosition(MainMenuText.getPosition());
 
         //------------------------------------------------------------------------------------------------------------------------------------------
-        // Positions of Play Options objects.
+        // Positions of Options objects.
         //------------------------------------------------------------------------------------------------------------------------------------------
         sf::Transform transform = Speaker.getTransform();
         sf::Transform transform2 = MusicSymbol.getTransform();
@@ -414,10 +520,23 @@ int main(){
         MusicVolumeText.setString(MusicVolumeString);
 
         //FullScreen does not have a position, because it is position to the origin (top left) by default.
-       
+
         // Positions of the TestSound.
         TestSoundText.setPosition({ FullScreenText.getPosition().x, FullScreenText.getPosition().y + 50 });
         TestSoundButton.setPosition(TestSoundText.getPosition());
+        
+        if (isOptions) {
+            ReturnText.setPosition({ CenterX, CenterY + 30});
+            ReturnButton.setPosition(ReturnText.getPosition());
+        }
+        
+        if (isPlay) {
+            ReturnText.setPosition({ 0,0 });
+            ReturnButton.setPosition(ReturnText.getPosition());
+
+            OptionsText.setPosition({ 0, 50 });
+            OptionsButton.setPosition(OptionsText.getPosition());
+        }
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Drawing/Displaying the objects onto the Game Window.
@@ -425,12 +544,17 @@ int main(){
         PlayButton.setPosition({ OptionsButton.getPosition().x, OptionsButton.getPosition().y - 50 });
         PlayText.setPosition(PlayButton.getPosition());
 
-        OptionsButton.setPosition({ QuitButton.getPosition().x, QuitButton.getPosition().y - 50 });
-        OptionsText.setPosition(OptionsButton.getPosition());
+        if (isMainMenu) {
+            OptionsButton.setPosition({ QuitButton.getPosition().x, QuitButton.getPosition().y - 50 });
+            OptionsText.setPosition(OptionsButton.getPosition());
+        }
 
         QuitButton.setPosition({ CenterX, CenterY });
         QuitText.setPosition({ CenterX, CenterY });
         
+        //PreviousText.setString(to_string(PreviousScreen));
+        //PreviousText.setPosition({ 300, 300 });
+
         //Order matters when drawing objects.
         Game.clear();
         if (isMainMenu) {
@@ -458,11 +582,17 @@ int main(){
             Game.draw(MusicBar);
             Game.draw(MusicVolumeText);
             Game.draw(SoundCircle2);
+            Game.draw(ReturnButton);
+            Game.draw(ReturnText);
         }
 
         if (isPlay) {
             Game.draw(Puzzle);
             Game.draw(PuzzleText);
+            Game.draw(OptionsButton);
+            Game.draw(OptionsText);
+            Game.draw(MainMenuButton);
+            Game.draw(MainMenuText);
         }
         Game.display();  
     }
