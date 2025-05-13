@@ -64,9 +64,9 @@ int main(){
 
     //Music Sprite and texture.
     sf::Texture MusicTexture("TrebleClefBlack.png");
-    sf::Sprite Music(MusicTexture);
-    Music.setColor(sf::Color::White);
-    Music.setScale({ 0.25, 0.25 });
+    sf::Sprite MusicSymbol(MusicTexture);
+    MusicSymbol.setColor(sf::Color::White);
+    MusicSymbol.setScale({ 0.25, 0.25 });
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -382,42 +382,42 @@ int main(){
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Play Options objects.
         //------------------------------------------------------------------------------------------------------------------------------------------
-
-        //Position of the Text,Buttons, and Sprites.
         sf::Transform transform = Speaker.getTransform();
-        sf::Transform transform2 = Music.getTransform();
+        sf::Transform transform2 = MusicSymbol.getTransform();
 
-
-        // 2. Define the relative position
+        // Relative position of the objects. From Object1 to Object2.
         sf::Vector2f relativePosition(300, 90);
-        sf::Vector2f relativePosition2(0, 0);
 
-        // 3. Apply the transformation to the relative position
+        // Apply the transformation to the relative position.
         sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
         sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
 
-        // 4. Move sprite1 to the transformed position
+        // Move Object2 relative to Object1.
         SoundBar2.setPosition(transformedPosition);
         SoundBar.setPosition(transformedPosition);
 
+        // Positions of SoundBar and Volume
         VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
         Speaker.setPosition({ CenterX - 200, CenterY - 100 });
 
-
-
-        TestSoundText.setPosition({ FullScreenText.getPosition().x, FullScreenText.getPosition().y + 50 });
-        TestSoundButton.setPosition(TestSoundText.getPosition());
-
-        string VolumeString = to_string(Volume);
-        VolumeText.setString(VolumeString);
-
+        // Positions of MusicBar and Volume
         MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
-        Music.setPosition({ Speaker.getPosition().x, Speaker.getPosition().y - 100 });
+        MusicSymbol.setPosition({ Speaker.getPosition().x, Speaker.getPosition().y - 100 });
         MusicBar.setPosition(transformedPosition2);
         MusicBar2.setPosition(MusicBar.getPosition());
 
+        //Convert Volume and MusicVolume into string.
+        string VolumeString = to_string(Volume);
+        VolumeText.setString(VolumeString);
+
         string MusicVolumeString = to_string(MusicVolume);
         MusicVolumeText.setString(MusicVolumeString);
+
+        //FullScreen does not have a position, because it is position to the origin (top left) by default.
+       
+        // Positions of the TestSound.
+        TestSoundText.setPosition({ FullScreenText.getPosition().x, FullScreenText.getPosition().y + 50 });
+        TestSoundButton.setPosition(TestSoundText.getPosition());
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Drawing/Displaying the objects onto the Game Window.
@@ -430,9 +430,9 @@ int main(){
 
         QuitButton.setPosition({ CenterX, CenterY });
         QuitText.setPosition({ CenterX, CenterY });
+        
         //Order matters when drawing objects.
         Game.clear();
-
         if (isMainMenu) {
             Game.draw(QuitButton);
             Game.draw(QuitText);
@@ -442,7 +442,6 @@ int main(){
             Game.draw(PlayText);
             //Game.draw(Grape);
         }
-
 
         if (isOptions) {
             Game.draw(FullScreenButton);
@@ -454,7 +453,7 @@ int main(){
             Game.draw(SoundCircle);
             Game.draw(TestSoundButton);
             Game.draw(TestSoundText);
-            Game.draw(Music);
+            Game.draw(MusicSymbol);
             Game.draw(MusicBar2);
             Game.draw(MusicBar);
             Game.draw(MusicVolumeText);
@@ -465,13 +464,8 @@ int main(){
             Game.draw(Puzzle);
             Game.draw(PuzzleText);
         }
-        Game.display();
-
-        
+        Game.display();  
     }
-    music.stop();
-
-
 }
 
 
