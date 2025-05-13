@@ -251,6 +251,9 @@ int main(){
 
     sf::Text MusicVolumeText(font);
 
+    sf::Text PuzzleText(font);
+    PuzzleText.setString("Puzzle Piece");
+
     //sf::Texture GrapeTexture("Grapes.png");
     //sf::Sprite Grape(GrapeTexture);
     //Grape.setColor(sf::Color::Blue);
@@ -278,9 +281,15 @@ int main(){
     sf::RectangleShape MusicBar({ 300,20 });
     sf::RectangleShape MusicBar2(MusicBar.getSize());
 
+    //Puzzle Piece
+    sf::RectangleShape Puzzle(PuzzleText.getGlobalBounds().size);
+    Puzzle.setPosition({ 300, 400 });
+
+    //SoundBar
     SoundBar.setFillColor(sf::Color::Green);
     SoundBar2.setFillColor(sf::Color::White);
 
+    //MusicBar
     MusicBar.setFillColor(sf::Color::Green);
     MusicBar2.setFillColor(sf::Color::White);
 
@@ -296,6 +305,12 @@ int main(){
     sf::Music music("city-bgm-336601.mp3");
     music.play();
     music.setLooping(true);
+
+    //Creating the 4 default angles
+    sf::Angle NorthAngle = sf::degrees(0);
+    sf::Angle EastAngle = sf::degrees(90);
+    sf::Angle SouthAngle = sf::degrees(180);
+    sf::Angle WestAngle = sf::degrees(270);
 
         // run the program as long as the window is open
     while (MainMenu.isOpen()) {
@@ -403,6 +418,55 @@ int main(){
             SoundCircle2.setFillColor(sf::Color::Green);
         }
 
+        // Puzzle Changes to red when mouse hover.
+        if (Puzzle.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            Puzzle.setFillColor(sf::Color::Red);
+
+            // left mouse button is pressed drag the puzzle piece
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                //Pick up the center piece of the puzzle, and drag them to a new position
+                if (Puzzle.getRotation() == NorthAngle) {
+                    Puzzle.setPosition({ (float)localPosition.x - Puzzle.getSize().x / 2, (float)localPosition.y - Puzzle.getSize().y / 2 });
+                }
+
+                if (Puzzle.getRotation() == WestAngle) {
+                    Puzzle.setPosition({ (float)localPosition.x - Puzzle.getSize().y / 2, (float)localPosition.y + Puzzle.getSize().x / 2 });
+                }
+
+                if (Puzzle.getRotation() == SouthAngle) {
+                    Puzzle.setPosition({ (float)localPosition.x + Puzzle.getSize().x / 2, (float)localPosition.y + Puzzle.getSize().y / 2 });
+                }
+
+                if (Puzzle.getRotation() == EastAngle) {
+                    Puzzle.setPosition({ (float)localPosition.x + Puzzle.getSize().y / 2, (float)localPosition.y - Puzzle.getSize().x / 2 });
+                }
+
+
+                //Change the rotation of the Puzzle piece.
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                    Puzzle.setRotation(WestAngle);
+                }
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                    Puzzle.setRotation(NorthAngle);
+                }
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                    Puzzle.setRotation(SouthAngle);
+                }
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                    Puzzle.setRotation(EastAngle);
+                }
+
+
+            }
+        }
+        else {
+            Puzzle.setFillColor(sf::Color::Blue);
+        }
+
         // check all the window's events that were triggered since the last iteration of the loop
         while (const std::optional event = MainMenu.pollEvent()) {
             // "close requested" event: we close the window
@@ -414,13 +478,16 @@ int main(){
         //Position of the Text,Buttons, and Sprites.
         sf::Transform transform = Speaker.getTransform();
         sf::Transform transform2 = Music.getTransform();
+        sf::Transform transform3 = Puzzle.getTransform();
 
         // 2. Define the relative position
         sf::Vector2f relativePosition(300, 90);
+        sf::Vector2f relativePosition2(0, 0);
 
         // 3. Apply the transformation to the relative position
         sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
         sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
+        sf::Vector2f transformedPosition3 = transform3.transformPoint(relativePosition2);
 
         // 4. Move sprite1 to the transformed position
         SoundBar2.setPosition(transformedPosition);
@@ -447,6 +514,9 @@ int main(){
         MusicVolumeText.setString(MusicVolumeString);
 
 
+        PuzzleText.setPosition(Puzzle.getPosition());
+        PuzzleText.setRotation(Puzzle.getRotation());
+
         //Order matters when drawing objects.
         MainMenu.clear();
         MainMenu.draw(QuitButton);
@@ -465,6 +535,8 @@ int main(){
         MainMenu.draw(MusicBar);
         MainMenu.draw(MusicVolumeText);
         MainMenu.draw(SoundCircle2);
+        MainMenu.draw(Puzzle);
+        MainMenu.draw(PuzzleText);
         //MainMenu.draw(Grape);
         MainMenu.display();
 
