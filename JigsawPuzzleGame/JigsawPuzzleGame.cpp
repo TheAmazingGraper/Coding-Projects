@@ -231,7 +231,7 @@ int main(){
 
     //Opens a window the size of (1000, 600).
     //sf::RenderWindow MainMenu(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
-    sf::RenderWindow MainMenu(sf::VideoMode({ 1000, 600 }), "Main Menu");
+    sf::RenderWindow Game(sf::VideoMode({ 1000, 600 }), "Main Menu");
     
     //Fonts
     sf::Font font("AGENCYR.ttf");
@@ -316,12 +316,19 @@ int main(){
     sf::Angle SouthAngle = sf::degrees(180);
     sf::Angle WestAngle = sf::degrees(270);
 
+    //Bools for windows changes
+    
+    bool isMainMenu = true;
+    bool isOptions = false;
+    bool isPlay = false;
+
         // run the program as long as the window is open
-    while (MainMenu.isOpen()) {
+    while (Game.isOpen()) {
 
-        
+        int Volume = (int)SoundBar.getSize().x / 3; // Convert the float into an int, then that int into a string.
+        int MusicVolume = (int)MusicBar.getSize().x / 3;
 
-        sf::Vector2u WindowSize = MainMenu.getSize();
+        sf::Vector2u WindowSize = Game.getSize();
         int WindowX = WindowSize.x;
         int WindowY = WindowSize.y;
 
@@ -330,7 +337,7 @@ int main(){
 
 
         // get the local mouse position (relative to a window)
-        sf::Vector2i localPosition = sf::Mouse::getPosition(MainMenu); // window is a sf::Window
+        sf::Vector2i localPosition = sf::Mouse::getPosition(Game); // window is a sf::Window
 
 
         // Quit Button Changes to red when mouse hover.
@@ -338,7 +345,7 @@ int main(){
             QuitButton.setFillColor(sf::Color::Red);
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                 // left mouse button is pressed on top of quit button then close menu.
-                MainMenu.close();
+                Game.close();
             }
         }
         else {
@@ -396,162 +403,90 @@ int main(){
             Puzzle.setFillColor(sf::Color::Blue);
         }
 
+        // FullScreen Button Changes to red when mouse hover.
+        if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            FullScreenButton.setFillColor(sf::Color::Red);
+
+            // left mouse button is pressed on top of FullScreen button then close menu.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                Game.create(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
+            }
+        }
+        else {
+            FullScreenButton.setFillColor(sf::Color::Blue);
+        }
+
+        // SoundBar  Changes to red when mouse hover ove the global bounds of SoundBar2.
+        //I have to use the SoundBar2 for the global bounds, since SoundBar changes.
+        if (SoundBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            //SoundBar.setFillColor(sf::Color::Red);
+            SoundCircle.setPosition({ (float)localPosition.x - 10, SoundBar.getPosition().y });
+            SoundCircle.setFillColor(sf::Color::White);
+            Game.draw(SoundCircle);
+
+            // left mouse button is pressed on SoundCircle to adjust volume.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                //Stop sound circle from going below the SoundBar position x.
+                if (SoundCircle.getPosition().x < SoundBar.getPosition().x)
+                    SoundCircle.setPosition(SoundBar.getPosition());
+                SoundBar.setSize({ (localPosition.x - SoundBar.getPosition().x), SoundBar.getSize().y });
+            }
+
+        }
+        else {
+            SoundBar.setFillColor(sf::Color::Green);
+            SoundCircle.setFillColor(sf::Color::Green);
+        }
+
+        // TestSound Button Changes to red when mouse hover.
+        if (TestSoundButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            TestSoundButton.setFillColor(sf::Color::Red);
+
+            // left mouse button is pressed on top of FullScreen button then close menu.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                sound.setVolume(Volume);
+                sound.play();
+            }
+        }
+        else {
+            TestSoundButton.setFillColor(sf::Color::Blue);
+        }
+
+        // MusicBar (Same thing as the SoundBar, but this one control the volume of the music).
+        if (MusicBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            //MusicBar.setFillColor(sf::Color::Red);
+            SoundCircle2.setPosition({ (float)localPosition.x - 10, MusicBar2.getPosition().y });
+            SoundCircle2.setFillColor(sf::Color::White);
+            Game.draw(SoundCircle2);
+
+            // left mouse button is pressed on SoundCircle2 to adjust volume.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                //Stop sound circle from going below the SoundBar position x.
+                if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
+                    SoundCircle2.setPosition(MusicBar.getPosition());
+
+                MusicBar.setSize({ (localPosition.x - MusicBar.getPosition().x), MusicBar.getSize().y });
+                music.setVolume(MusicVolume);
+            }
+
+        }
+        else {
+            MusicBar.setFillColor(sf::Color::Green);
+            SoundCircle2.setFillColor(sf::Color::Green);
+        }
+
         // OptionsButton Changes to red when mouse hover.
         if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
             OptionsButton.setFillColor(sf::Color::Red);
 
             // left mouse button is pressed on top of FullScreen button then close menu.
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                
-                //MainMenu.close();
-                //MainMenu.create(sf::VideoMode(MainMenu.getSize()), "Options");
-
-
-                sf::RenderWindow Options(sf::VideoMode({800, 600}), "Options");
-
-                while (Options.isOpen()) {
-                    
-                    int Volume = (int)SoundBar.getSize().x / 3; // Convert the float into an int, then that int into a string.
-                    int MusicVolume = (int)MusicBar.getSize().x / 3;
-
-                    sf::Vector2i localPosition = sf::Mouse::getPosition(Options); // window is a sf::Window
-
-                    // check all the window's events that were triggered since the last iteration of the loop
-                    while (const std::optional event = Options.pollEvent()) {
-                        // "close requested" event: we close the window
-                        if (event->is<sf::Event::Closed>())
-                            Options.close();
-                    }
-
-                    // FullScreen Button Changes to red when mouse hover.
-                    if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                        FullScreenButton.setFillColor(sf::Color::Red);
-
-                        // left mouse button is pressed on top of FullScreen button then close menu.
-                        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                            MainMenu.create(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
-                        }
-                    }
-                    else {
-                        FullScreenButton.setFillColor(sf::Color::Blue);
-                    }
-
-                    // SoundBar  Changes to red when mouse hover ove the global bounds of SoundBar2.
-                    //I have to use the SoundBar2 for the global bounds, since SoundBar changes.
-                    if (SoundBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                        //SoundBar.setFillColor(sf::Color::Red);
-                        SoundCircle.setPosition({ (float)localPosition.x - 10, SoundBar.getPosition().y });
-                        SoundCircle.setFillColor(sf::Color::White);
-                        MainMenu.draw(SoundCircle);
-
-                        // left mouse button is pressed on SoundCircle to adjust volume.
-                        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                            //Stop sound circle from going below the SoundBar position x.
-                            if (SoundCircle.getPosition().x < SoundBar.getPosition().x)
-                                SoundCircle.setPosition(SoundBar.getPosition());
-                            SoundBar.setSize({ (localPosition.x - SoundBar.getPosition().x), SoundBar.getSize().y });
-                        }
-
-                    }
-                    else {
-                        SoundBar.setFillColor(sf::Color::Green);
-                        SoundCircle.setFillColor(sf::Color::Green);
-                    }
-
-                    // TestSound Button Changes to red when mouse hover.
-                    if (TestSoundButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                        TestSoundButton.setFillColor(sf::Color::Red);
-
-                        // left mouse button is pressed on top of FullScreen button then close menu.
-                        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                            sound.setVolume(Volume);
-                            sound.play();
-                        }
-                    }
-                    else {
-                        TestSoundButton.setFillColor(sf::Color::Blue);
-                    }
-
-                    // MusicBar (Same thing as the SoundBar, but this one control the volume of the music).
-                    if (MusicBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                        //MusicBar.setFillColor(sf::Color::Red);
-                        SoundCircle2.setPosition({ (float)localPosition.x - 10, MusicBar2.getPosition().y });
-                        SoundCircle2.setFillColor(sf::Color::White);
-                        MainMenu.draw(SoundCircle2);
-
-                        // left mouse button is pressed on SoundCircle2 to adjust volume.
-                        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                            //Stop sound circle from going below the SoundBar position x.
-                            if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
-                                SoundCircle2.setPosition(MusicBar.getPosition());
-
-                            MusicBar.setSize({ (localPosition.x - MusicBar.getPosition().x), MusicBar.getSize().y });
-                            music.setVolume(MusicVolume);
-                        }
-
-                    }
-                    else {
-                        MusicBar.setFillColor(sf::Color::Green);
-                        SoundCircle2.setFillColor(sf::Color::Green);
-                    }
-
-
-                    //Position of the Text,Buttons, and Sprites.
-                    sf::Transform transform = Speaker.getTransform();
-                    sf::Transform transform2 = Music.getTransform();
-
-
-                    // 2. Define the relative position
-                    sf::Vector2f relativePosition(300, 90);
-                    sf::Vector2f relativePosition2(0, 0);
-
-                    // 3. Apply the transformation to the relative position
-                    sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
-                    sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
-
-                    // 4. Move sprite1 to the transformed position
-                    SoundBar2.setPosition(transformedPosition);
-                    SoundBar.setPosition(transformedPosition);
-
-                    VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
-                    Speaker.setPosition({ CenterX - 200, CenterY - 100 });
-
-
-
-                    TestSoundText.setPosition({ FullScreenText.getPosition().x, FullScreenText.getPosition().y + 50 });
-                    TestSoundButton.setPosition(TestSoundText.getPosition());
-
-                    string VolumeString = to_string(Volume);
-                    VolumeText.setString(VolumeString);
-
-                    MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
-                    Music.setPosition({ Speaker.getPosition().x, Speaker.getPosition().y - 100 });
-                    MusicBar.setPosition(transformedPosition2);
-                    MusicBar2.setPosition(MusicBar.getPosition());
-
-                    string MusicVolumeString = to_string(MusicVolume);
-                    MusicVolumeText.setString(MusicVolumeString);
-
-                    Options.clear();
-                    Options.draw(FullScreenButton);
-                    Options.draw(FullScreenText);
-                    Options.draw(Speaker);
-                    Options.draw(SoundBar2);
-                    Options.draw(SoundBar);
-                    Options.draw(VolumeText);
-                    Options.draw(SoundCircle);
-                    Options.draw(TestSoundButton);
-                    Options.draw(TestSoundText);
-                    Options.draw(Music);
-                    Options.draw(MusicBar2);
-                    Options.draw(MusicBar);
-                    Options.draw(MusicVolumeText);
-                    Options.draw(SoundCircle2);
-                    Options.display();
-                }
-
+                isMainMenu = false;
+                isOptions = true;
+                isPlay = false;
+                Game.create(sf::VideoMode(Game.getSize()), "Options");
             }
         }
         else {
@@ -559,10 +494,10 @@ int main(){
         }
 
         // check all the window's events that were triggered since the last iteration of the loop
-        while (const std::optional event = MainMenu.pollEvent()) {
+        while (const std::optional event = Game.pollEvent()) {
             // "close requested" event: we close the window
             if (event->is<sf::Event::Closed>())
-                MainMenu.close();
+                Game.close();
         }
 
 
@@ -580,16 +515,74 @@ int main(){
         OptionsText.setPosition(OptionsButton.getPosition());
 
 
+        //Position of the Text,Buttons, and Sprites.
+        sf::Transform transform = Speaker.getTransform();
+        sf::Transform transform2 = Music.getTransform();
+
+
+        // 2. Define the relative position
+        sf::Vector2f relativePosition(300, 90);
+        sf::Vector2f relativePosition2(0, 0);
+
+        // 3. Apply the transformation to the relative position
+        sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
+        sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
+
+        // 4. Move sprite1 to the transformed position
+        SoundBar2.setPosition(transformedPosition);
+        SoundBar.setPosition(transformedPosition);
+
+        VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
+        Speaker.setPosition({ CenterX - 200, CenterY - 100 });
+
+
+
+        TestSoundText.setPosition({ FullScreenText.getPosition().x, FullScreenText.getPosition().y + 50 });
+        TestSoundButton.setPosition(TestSoundText.getPosition());
+
+        string VolumeString = to_string(Volume);
+        VolumeText.setString(VolumeString);
+
+        MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
+        Music.setPosition({ Speaker.getPosition().x, Speaker.getPosition().y - 100 });
+        MusicBar.setPosition(transformedPosition2);
+        MusicBar2.setPosition(MusicBar.getPosition());
+
+        string MusicVolumeString = to_string(MusicVolume);
+        MusicVolumeText.setString(MusicVolumeString);
+
         //Order matters when drawing objects.
-        MainMenu.clear();
-        MainMenu.draw(QuitButton);
-        MainMenu.draw(QuitText);
-        MainMenu.draw(Puzzle);
-        MainMenu.draw(PuzzleText);
-        MainMenu.draw(OptionsButton);
-        MainMenu.draw(OptionsText);
-        //MainMenu.draw(Grape);
-        MainMenu.display();
+        
+        if (isMainMenu) {
+            Game.clear();
+            Game.draw(QuitButton);
+            Game.draw(QuitText);
+            Game.draw(Puzzle);
+            Game.draw(PuzzleText);
+            Game.draw(OptionsButton);
+            Game.draw(OptionsText);
+        }
+
+
+        if (isOptions) {
+            Game.draw(FullScreenButton);
+            Game.draw(FullScreenText);
+            Game.draw(Speaker);
+            Game.draw(SoundBar2);
+            Game.draw(SoundBar);
+            Game.draw(VolumeText);
+            Game.draw(SoundCircle);
+            Game.draw(TestSoundButton);
+            Game.draw(TestSoundText);
+            Game.draw(Music);
+            Game.draw(MusicBar2);
+            Game.draw(MusicBar);
+            Game.draw(MusicVolumeText);
+            Game.draw(SoundCircle2);
+        }
+
+        //Game.draw(Grape);
+        Game.display();
 
         
     }
