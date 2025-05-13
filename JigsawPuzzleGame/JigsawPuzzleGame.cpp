@@ -5,6 +5,7 @@ using namespace std;
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/Audio.hpp>
 
 int main(){
 
@@ -232,25 +233,39 @@ int main(){
     //sf::RenderWindow MainMenu(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
     sf::RenderWindow MainMenu(sf::VideoMode({ 800, 600 }), "Main Menu");
     
+    //Fonts
     sf::Font font("AGENCYR.ttf");
     sf::Font font2("AGENCYB.ttf");
 
+    //Texts
     sf::Text QuitText(font2);
     QuitText.setString("Quit");
 
     sf::Text FullScreenText(font);
     FullScreenText.setString("Full Screen");
 
-    sf::Text VolumeText(font);
+    sf::Text VolumeText(font); // The setString is in the window.
 
-    sf::Texture GrapeTexture("Grapes.png");
-    sf::Sprite Grape(GrapeTexture);
-    Grape.setColor(sf::Color::Blue);
+    sf::Text TestSoundText(font);
+    TestSoundText.setString("TestSound");
 
+    sf::Text MusicVolumeText(font);
+
+    //sf::Texture GrapeTexture("Grapes.png");
+    //sf::Sprite Grape(GrapeTexture);
+    //Grape.setColor(sf::Color::Blue);
+
+    //Speaker Sprite and texture.
     sf::Texture SpeakerTexture("Speaker.png");
     sf::Sprite Speaker(SpeakerTexture);
     Speaker.setColor(sf::Color::White);
     Speaker.setScale({ 0.25, 0.25 });
+
+    //Music Sprite and texture.
+    sf::Texture MusicTexture("TrebleClefBlack.png");
+    sf::Sprite Music(MusicTexture);
+    Music.setColor(sf::Color::White);
+    Music.setScale({ 0.25, 0.25 });
 
 
     //Buttons
@@ -259,19 +274,33 @@ int main(){
     sf::RectangleShape FullScreenButton(FullScreenText.getGlobalBounds().size); //Fullscreen
     sf::RectangleShape SoundBar({ 300, 20 }); //SoundBar is 300 pixel long.
     sf::RectangleShape SoundBar2({ 300, 20 });
+    sf::RectangleShape TestSoundButton(TestSoundText.getGlobalBounds().size);
+    sf::RectangleShape MusicBar({ 300,20 });
+    sf::RectangleShape MusicBar2(MusicBar.getSize());
+
     SoundBar.setFillColor(sf::Color::Green);
     SoundBar2.setFillColor(sf::Color::White);
 
-    sf::CircleShape SoundCircle(10, 20);
-    SoundCircle.setFillColor(sf::Color::White);
-    
+    MusicBar.setFillColor(sf::Color::Green);
+    MusicBar2.setFillColor(sf::Color::White);
 
+    sf::CircleShape SoundCircle(10, 20); //SoundBar cursor
+    sf::CircleShape SoundCircle2(10, 20); //MusicBar cursor
+
+    //Sounds
+    sf::SoundBuffer buffer("Windows Background.wav");
+    sf::Sound sound(buffer);
+    
+    //Musics
+    //Music by <a href="https://pixabay.com/users/kimurasukuru-25042105/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=336601">kimurasukuru</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=336601">Pixabay</a>
+    sf::Music music("city-bgm-336601.mp3");
+    music.play();
+    music.setLooping(true);
 
         // run the program as long as the window is open
     while (MainMenu.isOpen()) {
 
-
-
+        
 
         sf::Vector2u WindowSize = MainMenu.getSize();
         int WindowX = WindowSize.x;
@@ -280,6 +309,9 @@ int main(){
         float CenterX = WindowX / 2;
         float CenterY = WindowY / 2;
 
+
+        int Volume = (int)SoundBar.getSize().x / 3; // Convert the float into an int, then that int into a string.
+        int MusicVolume = (int)MusicBar.getSize().x / 3;
 
         // get the local mouse position (relative to a window)
         sf::Vector2i localPosition = sf::Mouse::getPosition(MainMenu); // window is a sf::Window
@@ -314,33 +346,62 @@ int main(){
         //I have to use the SoundBar2 for the global bounds, since SoundBar changes.
         if (SoundBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
             //SoundBar.setFillColor(sf::Color::Red);
-            SoundCircle.setPosition({ (float)localPosition.x-10, SoundBar.getPosition().y });
+            SoundCircle.setPosition({ (float)localPosition.x - 10, SoundBar.getPosition().y });
             SoundCircle.setFillColor(sf::Color::White);
             MainMenu.draw(SoundCircle);
 
             // left mouse button is pressed on SoundCircle to adjust volume.
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                //Code here to change the sound
-                //SoundBar.setSize();
-                
+
                 //Stop sound circle from going below the SoundBar position x.
                 if (SoundCircle.getPosition().x < SoundBar.getPosition().x)
                     SoundCircle.setPosition(SoundBar.getPosition());
-
-                SoundBar.setSize({ (localPosition.x-SoundBar.getPosition().x ), SoundBar.getSize().y});
-                
-                
+                SoundBar.setSize({ (localPosition.x - SoundBar.getPosition().x), SoundBar.getSize().y });
             }
 
         }
         else {
             SoundBar.setFillColor(sf::Color::Green);
             SoundCircle.setFillColor(sf::Color::Green);
-            
         }
 
+        // TestSound Button Changes to red when mouse hover.
+        if (TestSoundButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            TestSoundButton.setFillColor(sf::Color::Red);
 
+            // left mouse button is pressed on top of FullScreen button then close menu.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                sound.setVolume(Volume);
+                sound.play();
+            }
+        }
+        else {
+            TestSoundButton.setFillColor(sf::Color::Blue);
+        }
 
+        // MusicBar (Same thing as the SoundBar, but this one control the volume of the music).
+        if (MusicBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            //MusicBar.setFillColor(sf::Color::Red);
+            SoundCircle2.setPosition({ (float)localPosition.x - 10, MusicBar2.getPosition().y });
+            SoundCircle2.setFillColor(sf::Color::White);
+            MainMenu.draw(SoundCircle2);
+          
+            // left mouse button is pressed on SoundCircle2 to adjust volume.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                //Stop sound circle from going below the SoundBar position x.
+                if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
+                    SoundCircle2.setPosition(MusicBar.getPosition());
+
+                MusicBar.setSize({ (localPosition.x - MusicBar.getPosition().x), MusicBar.getSize().y });
+                music.setVolume(MusicVolume);
+            }
+
+        }
+        else {
+            MusicBar.setFillColor(sf::Color::Green);
+            SoundCircle2.setFillColor(sf::Color::Green);
+        }
 
         // check all the window's events that were triggered since the last iteration of the loop
         while (const std::optional event = MainMenu.pollEvent()) {
@@ -352,27 +413,39 @@ int main(){
 
         //Position of the Text,Buttons, and Sprites.
         sf::Transform transform = Speaker.getTransform();
+        sf::Transform transform2 = Music.getTransform();
 
         // 2. Define the relative position
         sf::Vector2f relativePosition(300, 90);
 
         // 3. Apply the transformation to the relative position
         sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
+        sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
 
         // 4. Move sprite1 to the transformed position
         SoundBar2.setPosition(transformedPosition);
         SoundBar.setPosition(transformedPosition);
 
-        VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50});
+        VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
         Speaker.setPosition({ CenterX - 200, CenterY - 100 });
         QuitButton.setPosition({ CenterX, CenterY });
         QuitText.setPosition({ CenterX, CenterY });
-        
 
-        string VolumeString = to_string((int)SoundBar.getSize().x/3); // Convert the float into an int, then that int into a string.
+
+        TestSoundText.setPosition({ FullScreenText.getPosition().x, FullScreenText.getPosition().y + 50 });
+        TestSoundButton.setPosition(TestSoundText.getPosition());
+
+        string VolumeString = to_string(Volume);
         VolumeText.setString(VolumeString);
 
-        
+        MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
+        Music.setPosition({Speaker.getPosition().x, Speaker.getPosition().y - 100});
+        MusicBar.setPosition(transformedPosition2);
+        MusicBar2.setPosition(MusicBar.getPosition());
+
+        string MusicVolumeString = to_string(MusicVolume);
+        MusicVolumeText.setString(MusicVolumeString);
+
 
         //Order matters when drawing objects.
         MainMenu.clear();
@@ -385,11 +458,19 @@ int main(){
         MainMenu.draw(SoundBar);
         MainMenu.draw(VolumeText);
         MainMenu.draw(SoundCircle);
+        MainMenu.draw(TestSoundButton);
+        MainMenu.draw(TestSoundText);
+        MainMenu.draw(Music);
+        MainMenu.draw(MusicBar2);
+        MainMenu.draw(MusicBar);
+        MainMenu.draw(MusicVolumeText);
+        MainMenu.draw(SoundCircle2);
         //MainMenu.draw(Grape);
         MainMenu.display();
 
         
     }
+    music.stop();
 
 
 }
