@@ -229,7 +229,7 @@ int main(){
     //-------------------------------------------------
 
 
-    //
+    //Opens a window the size of (800, 600).
     //sf::RenderWindow MainMenu(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
     sf::RenderWindow MainMenu(sf::VideoMode({ 800, 600 }), "Main Menu");
     
@@ -253,6 +253,9 @@ int main(){
 
     sf::Text PuzzleText(font);
     PuzzleText.setString("Puzzle Piece");
+
+    sf::Text OptionsText(font);
+    OptionsText.setString("Options");
 
     //sf::Texture GrapeTexture("Grapes.png");
     //sf::Sprite Grape(GrapeTexture);
@@ -280,6 +283,7 @@ int main(){
     sf::RectangleShape TestSoundButton(TestSoundText.getGlobalBounds().size);
     sf::RectangleShape MusicBar({ 300,20 });
     sf::RectangleShape MusicBar2(MusicBar.getSize());
+    sf::RectangleShape OptionsButton(OptionsText.getGlobalBounds().size);
 
     //Puzzle Piece
     sf::RectangleShape Puzzle(PuzzleText.getGlobalBounds().size);
@@ -445,7 +449,7 @@ int main(){
 
                 //Change the rotation of the Puzzle piece.
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                    Puzzle.setRotation(WestAngle);
+                   Puzzle.setRotation(WestAngle);
                 }
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
@@ -467,6 +471,20 @@ int main(){
             Puzzle.setFillColor(sf::Color::Blue);
         }
 
+        // OptionsButton Changes to red when mouse hover.
+        if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            OptionsButton.setFillColor(sf::Color::Red);
+
+            // left mouse button is pressed on top of FullScreen button then close menu.
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                //sound.setVolume(Volume);
+                //sound.play();
+            }
+        }
+        else {
+            OptionsButton.setFillColor(sf::Color::Blue);
+        }
+
         // check all the window's events that were triggered since the last iteration of the loop
         while (const std::optional event = MainMenu.pollEvent()) {
             // "close requested" event: we close the window
@@ -478,7 +496,7 @@ int main(){
         //Position of the Text,Buttons, and Sprites.
         sf::Transform transform = Speaker.getTransform();
         sf::Transform transform2 = Music.getTransform();
-        sf::Transform transform3 = Puzzle.getTransform();
+
 
         // 2. Define the relative position
         sf::Vector2f relativePosition(300, 90);
@@ -487,7 +505,6 @@ int main(){
         // 3. Apply the transformation to the relative position
         sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
         sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
-        sf::Vector2f transformedPosition3 = transform3.transformPoint(relativePosition2);
 
         // 4. Move sprite1 to the transformed position
         SoundBar2.setPosition(transformedPosition);
@@ -517,6 +534,9 @@ int main(){
         PuzzleText.setPosition(Puzzle.getPosition());
         PuzzleText.setRotation(Puzzle.getRotation());
 
+        OptionsButton.setPosition({ QuitButton.getPosition().x, QuitButton.getPosition().y + 50 });
+        OptionsText.setPosition(OptionsButton.getPosition());
+
         //Order matters when drawing objects.
         MainMenu.clear();
         MainMenu.draw(QuitButton);
@@ -537,6 +557,8 @@ int main(){
         MainMenu.draw(SoundCircle2);
         MainMenu.draw(Puzzle);
         MainMenu.draw(PuzzleText);
+        MainMenu.draw(OptionsButton);
+        MainMenu.draw(OptionsText);
         //MainMenu.draw(Grape);
         MainMenu.display();
 
