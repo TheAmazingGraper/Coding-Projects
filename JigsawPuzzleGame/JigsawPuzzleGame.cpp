@@ -54,6 +54,12 @@ int main(){
     sf::Text MainMenuText(font);
     MainMenuText.setString("Main Menu");
 
+    sf::Text WindowModeText(font);
+    WindowModeText.setString("Window Mode:");
+    
+    sf::Text WindowText(font);
+    WindowText.setString("Window");
+
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,12 +93,19 @@ int main(){
     sf::RectangleShape PlayButton(PlayText.getGlobalBounds().size);
     sf::RectangleShape ReturnButton(ReturnText.getGlobalBounds().size);
     sf::RectangleShape MainMenuButton(MainMenuText.getGlobalBounds().size);
+    sf::RectangleShape WindowModeButton(WindowModeText.getGlobalBounds().size);
+    sf::CircleShape TriangleUp(20.f, 3);
+    sf::CircleShape TriangleDown(20.f, 3);
+    
+    TriangleDown.setOrigin({TriangleDown.getRadius(),TriangleDown.getRadius()});
+    TriangleDown.rotate(sf::degrees(180));
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Puzzle Piece
     //------------------------------------------------------------------------------------------------------------------------------------------
     sf::RectangleShape Puzzle(PuzzleText.getGlobalBounds().size);
+    Puzzle.setOrigin({ Puzzle.getSize().x / 2, Puzzle.getSize().y / 2 });
     Puzzle.setPosition({ 300, 400 });
 
 
@@ -237,23 +250,8 @@ int main(){
 
                 // Left click and move to drag the puzzle piece.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                    //Pick up the center piece of the puzzle, and drag them to a new position
-                    if (Puzzle.getRotation() == NorthAngle) {
-                        Puzzle.setPosition({ (float)localPosition.x - Puzzle.getSize().x / 2, (float)localPosition.y - Puzzle.getSize().y / 2 });
-                    }
-
-                    if (Puzzle.getRotation() == WestAngle) {
-                        Puzzle.setPosition({ (float)localPosition.x - Puzzle.getSize().y / 2, (float)localPosition.y + Puzzle.getSize().x / 2 });
-                    }
-
-                    if (Puzzle.getRotation() == SouthAngle) {
-                        Puzzle.setPosition({ (float)localPosition.x + Puzzle.getSize().x / 2, (float)localPosition.y + Puzzle.getSize().y / 2 });
-                    }
-
-                    if (Puzzle.getRotation() == EastAngle) {
-                        Puzzle.setPosition({ (float)localPosition.x + Puzzle.getSize().y / 2, (float)localPosition.y - Puzzle.getSize().x / 2 });
-                    }
+                   
+                    Puzzle.setPosition({ (float)localPosition.x , (float)localPosition.y });
 
                     //Change the rotation of the Puzzle piece.
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
@@ -448,6 +446,19 @@ int main(){
             else {
                 ReturnButton.setFillColor(sf::Color::Blue);
             }
+
+            // WindowModeButton Changes to red when mouse hover.
+            if (WindowModeButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                WindowModeButton.setFillColor(sf::Color::Red);
+
+                // Left click to activate FullScreenMode.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    //Game.create(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
+                }
+            }
+            else {
+                WindowModeButton.setFillColor(sf::Color::Blue);
+            }
         }
 
 
@@ -481,6 +492,7 @@ int main(){
         // Position of puzzle pieces
         PuzzleText.setPosition(Puzzle.getPosition());
         PuzzleText.setRotation(Puzzle.getRotation());
+        PuzzleText.setOrigin(Puzzle.getOrigin());
 
         MainMenuText.setPosition({ 0, 0 });
         MainMenuButton.setPosition(MainMenuText.getPosition());
@@ -488,19 +500,26 @@ int main(){
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
         //------------------------------------------------------------------------------------------------------------------------------------------
+        // Transform change the position of Object2 relative to Object1
         sf::Transform transform = Speaker.getTransform();
         sf::Transform transform2 = MusicSymbol.getTransform();
+        sf::Transform transform3 = WindowModeButton.getTransform();
 
         // Relative position of the objects. From Object1 to Object2.
         sf::Vector2f relativePosition(300, 90);
+        sf::Vector2f relativePosition2(150, 0);
 
         // Apply the transformation to the relative position.
         sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
         sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
+        sf::Vector2f transformedPosition3 = transform3.transformPoint(relativePosition2);
 
         // Move Object2 relative to Object1.
         SoundBar2.setPosition(transformedPosition);
         SoundBar.setPosition(transformedPosition);
+        MusicBar.setPosition(transformedPosition2);
+        MusicBar2.setPosition(transformedPosition2);
+        WindowText.setPosition(transformedPosition3);
 
         // Positions of SoundBar and Volume
         VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
@@ -509,8 +528,6 @@ int main(){
         // Positions of MusicBar and Volume
         MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
         MusicSymbol.setPosition({ Speaker.getPosition().x, Speaker.getPosition().y - 100 });
-        MusicBar.setPosition(transformedPosition2);
-        MusicBar2.setPosition(MusicBar.getPosition());
 
         //Convert Volume and MusicVolume into string.
         string VolumeString = to_string(Volume);
@@ -524,6 +541,9 @@ int main(){
         // Positions of the TestSound.
         TestSoundText.setPosition({ FullScreenText.getPosition().x, FullScreenText.getPosition().y + 50 });
         TestSoundButton.setPosition(TestSoundText.getPosition());
+
+        WindowModeText.setPosition({ 100,300 });
+        WindowModeButton.setPosition(WindowModeText.getPosition());
         
         if (isOptions) {
             ReturnText.setPosition({ CenterX, CenterY + 30});
@@ -555,8 +575,15 @@ int main(){
         //PreviousText.setString(to_string(PreviousScreen));
         //PreviousText.setPosition({ 300, 300 });
 
+        TriangleUp.setPosition({ 100, CenterY });
+        TriangleDown.setPosition({ 100, CenterY + 50 });
+
         //Order matters when drawing objects.
         Game.clear();
+
+        Game.draw(TriangleUp);
+        Game.draw(TriangleDown);
+
         if (isMainMenu) {
             Game.draw(QuitButton);
             Game.draw(QuitText);
@@ -584,6 +611,9 @@ int main(){
             Game.draw(SoundCircle2);
             Game.draw(ReturnButton);
             Game.draw(ReturnText);
+            Game.draw(WindowModeButton);
+            Game.draw(WindowModeText);
+            Game.draw(WindowText);
         }
 
         if (isPlay) {
