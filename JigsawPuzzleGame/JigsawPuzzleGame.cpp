@@ -243,7 +243,7 @@ int main() {
     LevelClearText.setString("Level Clear!");
 
     sf::Text CollisionText(font);
-    CollisionText.setString("Collision!");
+    CollisionText.setString("Collision Detected!");
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
@@ -609,16 +609,23 @@ int main() {
             // P[3] checks for P[2] checks for P[1] checks for P[0]
             // What this means that if a collision occurs with P[3] and P[0]
             // They will not change color, but it will work eventually.
+
+            int pink = 0;
             for (int i = static_cast<int>(pieces.size()) - 1; i >= 1; --i) {
                 PuzzlePiece& piece = pieces[i];
                 if (pieces[i].getGlobalBounds().findIntersection(pieces[i - 1].getGlobalBounds())) {
                     pieces[i].setFillColor(sf::Color::Magenta);
                     pieces[i - 1].setFillColor(sf::Color::Magenta);
                     hasCollision = true;
-                }hasCollision = false;
-                
+                    pink++;
+                }
+                if (pink > 0)
+                    hasCollision = true;
+                else
+                    hasCollision = false;
 
                 
+
                 // When inside boundrary of solution box pieces become black
                 if (SolutionBox.getGlobalBounds().contains(pieces[i].getGlobalBounds().position))
                     pieces[i].setFillColor(sf::Color::Black);
