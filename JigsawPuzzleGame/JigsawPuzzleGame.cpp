@@ -12,9 +12,12 @@ using namespace std;
 #include <vector>
 #include <limits>
 #include <algorithm>
+
+#include <random>
 #include <iostream>
 #include <fstream>
 #include <string>
+
 
 
 class PuzzlePiece : public sf::Drawable, public sf::Transformable {
@@ -170,6 +173,238 @@ int main() {
         sf::RenderWindow Game(sf::VideoMode({ 800, 600 }), "Main Menu");
 
 
+    sf::Text PuzzleText(font);
+    PuzzleText.setString("Puzzle Piece");
+
+    sf::Text OptionsText(font);
+    OptionsText.setString("Options");
+
+    sf::Text PlayText(font);
+    PlayText.setString("Play");
+
+    sf::Text ReturnText(font);
+    ReturnText.setString("Return");
+
+    sf::Text MainMenuText(font);
+    MainMenuText.setString("Main Menu");
+
+    sf::Text ResolutionModeText(font);
+    ResolutionModeText.setString("Resolution Modes:");
+
+    sf::Text Text800x600(font);
+    Text800x600.setString("800x600");
+
+    sf::Text Text1280x720(font);
+    Text1280x720.setString("1280x720");
+
+    sf::Text Text1920x1080(font);
+    Text1920x1080.setString("1920x1080");
+
+    sf::Text FullScreenText(font);
+    FullScreenText.setString("Full Screen");
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Sprite Objects
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    //sf::Texture GrapeTexture("Grapes.png");
+    //sf::Sprite Grape(GrapeTexture);
+    //Grape.setColor(sf::Color::Blue);
+
+    // Sprite and texture.
+    sf::Texture SpeakerTexture("Speaker.png");
+    sf::Sprite Speaker(SpeakerTexture);
+    Speaker.setColor(sf::Color::White);
+    Speaker.setScale({ 0.25, 0.25 });
+
+    // Music Sprite and texture.
+    sf::Texture MusicTexture("TrebleClefBlack.png");
+    sf::Sprite MusicSymbol(MusicTexture);
+    MusicSymbol.setColor(sf::Color::White);
+    MusicSymbol.setScale({ 0.25, 0.25 });
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Buttons
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    sf::RectangleShape QuitButton(QuitText.getGlobalBounds().size); // Quit button
+    sf::RectangleShape FullScreenButton(FullScreenText.getGlobalBounds().size); //Fullscreen
+    sf::RectangleShape SoundBar({ 300, 20 }); //SoundBar is 300 pixel long.
+    sf::RectangleShape SoundBar2({ 300, 20 });
+    sf::RectangleShape TestSoundButton(TestSoundText.getGlobalBounds().size);
+    sf::RectangleShape MusicBar({ 300,20 });
+    sf::RectangleShape MusicBar2(MusicBar.getSize());
+    sf::RectangleShape OptionsButton(OptionsText.getGlobalBounds().size);
+    sf::RectangleShape PlayButton(PlayText.getGlobalBounds().size);
+    sf::RectangleShape ReturnButton(ReturnText.getGlobalBounds().size);
+    sf::RectangleShape MainMenuButton(MainMenuText.getGlobalBounds().size);
+    sf::RectangleShape ResolutionModeButton(ResolutionModeText.getGlobalBounds().size);
+    sf::CircleShape WindowModeUp(20.f, 3);
+    sf::CircleShape WindowModeDown(20.f, 3);
+    sf::RectangleShape Text800x600Button(Text800x600.getGlobalBounds().size);
+    sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
+    sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
+
+
+    WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
+    WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
+    WindowModeDown.rotate(sf::degrees(180));
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Sound bars and shapes
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    //SoundBar
+    SoundBar.setFillColor(sf::Color::Green);
+    SoundBar2.setFillColor(sf::Color::White);
+
+    //MusicBar
+    MusicBar.setFillColor(sf::Color::Green);
+    MusicBar2.setFillColor(sf::Color::White);
+
+    sf::CircleShape SoundCircle(10, 20); //SoundBar cursor
+    sf::CircleShape SoundCircle2(10, 20); //MusicBar cursor
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Sounds
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    sf::SoundBuffer buffer("Windows Background.wav");
+    sf::Sound sound(buffer);
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Music
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    //Music by <a href="https://pixabay.com/users/kimurasukuru-25042105/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=336601">kimurasukuru</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=336601">Pixabay</a>
+    sf::Music music("city-bgm-336601.mp3");
+    music.play();
+    music.setLooping(true);
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Angles
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    sf::Angle NorthAngle = sf::degrees(0);
+    sf::Angle EastAngle = sf::degrees(90);
+    sf::Angle SouthAngle = sf::degrees(180);
+    sf::Angle WestAngle = sf::degrees(270);
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Puzzle Pieces
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    
+    //need to create a piece crafter class
+    // craft a puzzle piece: (shape, length of side, color)
+    //PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
+    //piece.setPosition({ 300, 400 });
+    //piece.setRotation(NorthAngle);
+    //piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
+
+    //PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
+    //piece2.setPosition({ 400, 400 });
+    //piece2.setRotation(NorthAngle);
+    //piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
+
+    // shape 0 = L
+    // shape 1 = T
+    // shape 2 = plus
+    // shape 3 = minus
+    
+    std::vector<PuzzlePiece> pieces;
+    
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<int> xDist(100, 200);
+    std::uniform_int_distribution<int> yDist(100, Game.getSize().y);
+    std::uniform_int_distribution<int> angleDist(0, 3);
+
+    auto pieceMaker = [&](const std::vector<int>& shapeIds) {
+        float blockSize = 30;
+        sf::Color color = sf::Color::Blue;
+
+        for (int shapeId : shapeIds) {
+            pieces.emplace_back(shapeId, blockSize, color);
+            PuzzlePiece& piece = pieces.back();
+
+            piece.setPosition({
+                static_cast<float>(xDist(rng)),
+                static_cast<float>(yDist(rng))
+                });
+
+            sf::FloatRect bounds = piece.getGlobalBounds();
+            switch (shapeId) {
+            case 0: // L-shape
+                piece.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 8.f });
+                break;
+            case 1: // T-shape // -
+                piece.setOrigin({ bounds.size.x / 2.666f, bounds.size.y / 3.f });
+                break;
+            case 2: // Plus-shape
+                piece.setOrigin({ bounds.size.x / 2.6667f, bounds.size.y / 2.6667f });
+                break;
+            case 3: // minus-shape
+                piece.setOrigin({ bounds.size.x / 4.f, bounds.size.y / 8.f});
+                break;
+            }
+
+            switch (angleDist(rng)) {
+            case 0: piece.setRotation(NorthAngle); break;
+            case 1: piece.setRotation(EastAngle); break;
+            case 2: piece.setRotation(SouthAngle); break;
+            case 3: piece.setRotation(WestAngle); break;
+            }
+        }
+        };
+
+    auto drawPieces = [&Game, &pieces]() { // lambda function to draw the background
+        for (const auto& piece : pieces) {
+            Game.draw(piece);
+        }
+        };
+
+    pieceMaker({ 0, 1, 2, 3 });
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Windows types and screens
+    //------------------------------------------------------------------------------------------------------------------------------------------    
+    bool isMainMenu = true; // Screen = 0
+    bool isOptions = false; // Screen = 1
+    bool isPlay = false; // Screen = 2
+    bool isFullScreen = false;
+
+    int Screen = 0;
+
+    int ResolutionModes = 0;
+    //800x600:       ResolutionModes = 0
+    //1280x720:      ResolutionModes = 1
+    //1920x1080:     ResolutionModes = 2
+    //FullScreen:    ResolutionModes = 3
+
+    // Get the Previous screen value for the returnButton.
+    int PreviousScreen = Screen;
+
+    // Single Mouse click
+    bool click = true;
+
+    // Run the program as long as the game window is open.
+    while (Game.isOpen()) {
+        // Volumes of both sound and music. (also convert the float into int)
+        int Volume = (int)SoundBar.getSize().x / 3;
+        int MusicVolume = (int)MusicBar.getSize().x / 3;
+
+        // Finding the Game window size.
+        sf::Vector2u WindowSize = Game.getSize();
+        int WindowX = WindowSize.x;
+        int WindowY = WindowSize.y;
+
+        // Finding the center of the Game window.
+        float CenterX = WindowX / 2;
+        float CenterY = WindowY / 2;
+
+        // Get the local mouse position (relative to the Game window).
+        sf::Vector2i localPosition = sf::Mouse::getPosition(Game);
+
+
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Backgrounds
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -258,6 +493,34 @@ int main() {
         MusicSymbol.setColor(sf::Color::White);
         MusicSymbol.setScale({ 0.25, 0.25 });
 
+
+            // Puzzle Changes to red when mouse hover.
+            for (auto& piece : pieces) {
+                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && isPlay) {
+                    piece.setFillColor(sf::Color::Red);
+
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        piece.setPosition({ (float)localPosition.x, (float)localPosition.y });
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                            piece.setRotation(WestAngle);
+                        }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                            piece.setRotation(NorthAngle);
+                        }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                            piece.setRotation(SouthAngle);
+                        }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                            piece.setRotation(EastAngle);
+                        }
+                    }
+                }
+                else {
+                    piece.setFillColor(sf::Color::Blue);
+                }
+            }
+
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Buttons
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -336,6 +599,7 @@ int main() {
         piece.setPosition({ 200, 400 });
         piece.setRotation(NorthAngle);
         piece.setOrigin({ piece.getGlobalBounds().size.x / 3.f, piece.getGlobalBounds().size.y / 2.f });
+
 
         PuzzlePiece piece2(1, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
         piece2.setPosition({ 350, 400 });
@@ -783,11 +1047,21 @@ int main() {
                     TestSoundButton.setFillColor(sf::Color::Blue);
                 }
 
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Positions of Play objects.
+        //------------------------------------------------------------------------------------------------------------------------------------------ 
+        // Position of puzzle pieces
+        //PuzzleText.setPosition(piece.getPosition());
+        //PuzzleText.setRotation(piece.getRotation());
+        //PuzzleText.setOrigin(piece.getOrigin());
+
                 // MusicBar (Same thing as the SoundBar, but this one control the volume of the music).
                 if (MusicBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
                     SoundCircle2.setPosition({ (float)localPosition.x - 10, MusicBar2.getPosition().y });
                     SoundCircle2.setFillColor(sf::Color::White);
                     Game.draw(SoundCircle2);
+
 
                     // Left click to adjust volume.
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
@@ -1084,6 +1358,15 @@ int main() {
                 }
             }
 
+
+        if (isPlay) {
+            backgroundHelper();
+            drawPieces();
+            Game.draw(OptionsButton);
+            Game.draw(OptionsText);
+            Game.draw(MainMenuButton);
+            Game.draw(MainMenuText);
+
             if (isPlay) {
                 backgroundHelper();
                 Game.draw(SolutionBox);
@@ -1106,6 +1389,7 @@ int main() {
 
             }
             Game.display();
+
         }
     }
 
