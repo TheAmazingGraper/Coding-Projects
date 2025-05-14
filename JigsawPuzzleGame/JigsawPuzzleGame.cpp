@@ -619,7 +619,7 @@ int main(){
 
         // Positions of SoundBar and Volume
         VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
-        Speaker.setPosition({ CenterX - 200, CenterY - 100 });
+        Speaker.setPosition({ CenterX - 200, CenterY  });
 
         // Positions of MusicBar and Volume
         MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
@@ -634,7 +634,7 @@ int main(){
 
         // Positions of the TestSound is left at default (top left).
 
-        ResolutionModeText.setPosition({ 100,400 });
+        ResolutionModeText.setPosition({ MusicSymbol.getPosition().x, MusicSymbol.getPosition().y - 100});
         ResolutionModeButton.setPosition(ResolutionModeText.getPosition());
 
         WindowModeUp.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y });
@@ -645,7 +645,7 @@ int main(){
         //------------------------------------------------------------------------------------------------------------------------------------------
 
         if (isOptions) {
-            ReturnText.setPosition({ CenterX, CenterY + 30});
+            ReturnText.setPosition({ CenterX, CenterY + 100});
             ReturnButton.setPosition(ReturnText.getPosition());
         }
         
