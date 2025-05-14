@@ -296,7 +296,12 @@ int main() {
     PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
     piece.setPosition({ 300, 400 });
     piece.setRotation(NorthAngle);
-    piece.setOrigin({ piece.getGlobalBounds().size.x/3, piece.getGlobalBounds().size.y/2});
+    piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
+
+    PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
+    piece2.setPosition({ 400, 400 });
+    piece2.setRotation(NorthAngle);
+    piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
 
     // shape 0 = L
     // shape 1 = T
@@ -436,6 +441,36 @@ int main() {
             }
             else {
                 piece.setFillColor(sf::Color::Blue);
+            }
+
+            if (piece2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                piece2.setFillColor(sf::Color::Red);
+
+                // Left click and move to drag the puzzle piece2.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                    piece2.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                    //Change the rotation of the Puzzle piece2.
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                        piece2.setRotation(WestAngle);
+                    }
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                        piece2.setRotation(NorthAngle);
+                    }
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                        piece2.setRotation(SouthAngle);
+                    }
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                        piece2.setRotation(EastAngle);
+                    }
+                }
+            }
+            else {
+                piece2.setFillColor(sf::Color::Blue);
             }
 
             // OptionsButton Changes to red when mouse hover.
@@ -887,6 +922,7 @@ int main() {
         if (isPlay) {
             backgroundHelper();
             Game.draw(piece);
+            Game.draw(piece2);
             Game.draw(PuzzleText);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
