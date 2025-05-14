@@ -401,8 +401,28 @@ int main() {
         }
         };
 
-    pieceMaker({ 0, 1, 2, 3 });
+        //pieceMaker({ 0, 1, 2, 3 });
+        
+        //Level 3:
+        pieceMaker({ 0, 1, 1, 2, 3, 3, 3, 3, 3 });
 
+        //Level 4 :
+        //pieceMaker({ 0, 0, 1, 1, 2, 2, 3, 3, 3, 3 });
+
+        //Level 5 :
+        //pieceMaker({ 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3 });
+
+        //Level 6 :
+        //pieceMaker({ 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3 });
+
+        //Level 7 :
+        //pieceMaker({ 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 3 });
+
+        //Level 8 :
+        //pieceMaker({ 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3 });
+
+        //Level 9 :
+        //pieceMaker({ 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3 });
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Windows types and screens
@@ -595,10 +615,6 @@ int main() {
                 PuzzlePiece& piece2 = pieces[i];
             }
 
-
-                        // calculate if intersection between piece1 and piece2
-                        // if true, piece1.setFillColor(sf::Color Color(...));
-                        // piece2.setFillColor(...);
 
 
             // OptionsButton Changes to red when mouse hover.
@@ -1078,6 +1094,14 @@ int main() {
             
         }
         Game.display();
+
+
+        // A level is completed when there is no collision (Magenta blocks).
+        // When all puzzle pieces fits within the boundrary of the Solution box.
+        // When all puzzle pieces are used.
+        // When ... I thinks thats it.
+
+
     }
 }
 
