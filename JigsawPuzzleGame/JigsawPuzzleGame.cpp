@@ -2,19 +2,86 @@
 // Due Date May 14.
 
 using namespace std;
+
+#pragma once
+
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
+#include <vector>
+#include <limits>
+#include <algorithm>
 
-int main(){
+
+class TetrisPiece : public sf::Drawable, public sf::Transformable {
+public:
+    TetrisPiece(const std::vector<sf::Vector2i>& shape, float blockSize, sf::Color color = sf::Color::Blue)
+        : blockSize(blockSize), color(color) {
+        for (const auto& coord : shape) {
+            sf::RectangleShape block(sf::Vector2f(blockSize, blockSize));
+            block.setFillColor(color);
+            block.setOrigin(sf::Vector2f(blockSize / 2.f, blockSize / 2.f));
+            block.setPosition(sf::Vector2f(static_cast<float>(coord.x) * blockSize,
+                static_cast<float>(coord.y) * blockSize));
+            blocks.push_back(block);
+        }
+    }
+
+    void setFillColor(const sf::Color& newColor) {
+        color = newColor;
+        for (auto& block : blocks) {
+            block.setFillColor(color);
+        }
+    }
+
+    sf::FloatRect getGlobalBounds() const {
+        if (blocks.empty()) return {};
+
+        float minX = std::numeric_limits<float>::max();
+        float minY = std::numeric_limits<float>::max();
+        float maxX = std::numeric_limits<float>::lowest();
+        float maxY = std::numeric_limits<float>::lowest();
+
+        for (const auto& block : blocks) {
+            sf::Transform totalTransform = getTransform() * block.getTransform();
+            sf::FloatRect rect = totalTransform.transformRect(block.getLocalBounds());
+
+            minX = std::min<float>(minX, rect.position.x);
+            minY = std::min<float>(minY, rect.position.y);
+            maxX = std::max<float>(maxX, rect.position.x + rect.size.x);
+            maxY = std::max<float>(maxY, rect.position.y + rect.size.y);
+        }
+
+        return sf::FloatRect(sf::Vector2f(minX, minY), sf::Vector2f(maxX - minX, maxY - minY));
+    }
+
+    float getBlockSize() const {
+        return blockSize;
+    }
+
+private:
+    std::vector<sf::RectangleShape> blocks;
+    float blockSize;
+    sf::Color color;
+
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+        states.transform *= getTransform();
+        for (const auto& block : blocks) {
+            target.draw(block, states);
+        }
+    }
+};
+
+
+int main() {
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Writing the real code for the project here.
     //------------------------------------------------------------------------------------------------------------------------------------------
     //Opens a window the size of (800, 600).
     sf::RenderWindow Game(sf::VideoMode({ 800, 600 }), "Main Menu");
-    
+
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Fonts
@@ -29,7 +96,7 @@ int main(){
     sf::Text QuitText(font2);
     QuitText.setString("Quit");
 
-    sf::Text VolumeText(font); 
+    sf::Text VolumeText(font);
 
     sf::Text TestSoundText(font);
     TestSoundText.setString("TestSound");
@@ -108,15 +175,8 @@ int main(){
 
 
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
-    WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius()});
+    WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
     WindowModeDown.rotate(sf::degrees(180));
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Puzzle Piece
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    sf::RectangleShape Puzzle(PuzzleText.getGlobalBounds().size);
-    Puzzle.setOrigin({ Puzzle.getSize().x / 2, Puzzle.getSize().y / 2 });
-    Puzzle.setPosition({ 300, 400 });
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -139,7 +199,7 @@ int main(){
     //------------------------------------------------------------------------------------------------------------------------------------------
     sf::SoundBuffer buffer("Windows Background.wav");
     sf::Sound sound(buffer);
-    
+
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Music
@@ -160,6 +220,17 @@ int main(){
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
+    // Puzzle Piece
+    //------------------------------------------------------------------------------------------------------------------------------------------
+   // sf::RectangleShape Puzzle(PuzzleText.getGlobalBounds().size);
+    //Puzzle.setOrigin({ Puzzle.getSize().x / 2, Puzzle.getSize().y / 2 });
+   // Puzzle.setPosition({ 300, 400 });
+    TetrisPiece piece({ {0,0}, {1,0}, {0,1} }, 30.0f, sf::Color::Blue);
+    piece.setPosition({ 300, 400 });
+    piece.setRotation(NorthAngle);
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
     // Windows types and screens
     //------------------------------------------------------------------------------------------------------------------------------------------    
     bool isMainMenu = true; // Screen = 0
@@ -174,7 +245,7 @@ int main(){
     //1280x720:      ResolutionModes = 1
     //1920x1080:     ResolutionModes = 2
     //FullScreen:    ResolutionModes = 3
-    
+
     // Get the Previous screen value for the returnButton.
     int PreviousScreen = Screen;
 
@@ -263,34 +334,34 @@ int main(){
             Screen = 2;
 
             // Puzzle Changes to red when mouse hover.
-            if (Puzzle.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                Puzzle.setFillColor(sf::Color::Red);
+            if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                piece.setFillColor(sf::Color::Red);
 
                 // Left click and move to drag the puzzle piece.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                   
-                    Puzzle.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                    piece.setPosition({ (float)localPosition.x , (float)localPosition.y });
 
                     //Change the rotation of the Puzzle piece.
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                        Puzzle.setRotation(WestAngle);
+                        piece.setRotation(WestAngle);
                     }
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                        Puzzle.setRotation(NorthAngle);
+                        piece.setRotation(NorthAngle);
                     }
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                        Puzzle.setRotation(SouthAngle);
+                        piece.setRotation(SouthAngle);
                     }
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                        Puzzle.setRotation(EastAngle);
+                        piece.setRotation(EastAngle);
                     }
                 }
             }
             else {
-                Puzzle.setFillColor(sf::Color::Blue);
+                piece.setFillColor(sf::Color::Blue);
             }
 
             // OptionsButton Changes to red when mouse hover.
@@ -343,10 +414,10 @@ int main(){
 
                 // Left click to play test sound.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                        Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
-                        isMainMenu = true;
-                        isOptions = false;
-                        isPlay = false;
+                    Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
+                    isMainMenu = true;
+                    isOptions = false;
+                    isPlay = false;
                 }
             }
             else {
@@ -367,7 +438,7 @@ int main(){
 
                 // Left click to activate 800x600.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    Game.create(sf::VideoMode({800, 600}), "Options", sf::State::Windowed);
+                    Game.create(sf::VideoMode({ 800, 600 }), "Options", sf::State::Windowed);
                 }
             }
             else {
@@ -521,7 +592,7 @@ int main(){
                     ResolutionModes += 1;
                     click = false;
                 }
-                
+
             }
             else {
                 WindowModeUp.setFillColor(sf::Color::Blue);
@@ -536,7 +607,7 @@ int main(){
                     ResolutionModes -= 1;
                     click = false;
                 }
-                
+
             }
             else {
                 WindowModeDown.setFillColor(sf::Color::Blue);
@@ -577,9 +648,9 @@ int main(){
         // Positions of Play objects.
         //------------------------------------------------------------------------------------------------------------------------------------------ 
         // Position of puzzle pieces
-        PuzzleText.setPosition(Puzzle.getPosition());
-        PuzzleText.setRotation(Puzzle.getRotation());
-        PuzzleText.setOrigin(Puzzle.getOrigin());
+        PuzzleText.setPosition(piece.getPosition());
+        PuzzleText.setRotation(piece.getRotation());
+        PuzzleText.setOrigin(piece.getOrigin());
 
         MainMenuText.setPosition({ 0, 0 });
         MainMenuButton.setPosition(MainMenuText.getPosition());
@@ -619,7 +690,7 @@ int main(){
 
         // Positions of SoundBar and Volume
         VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
-        Speaker.setPosition({ CenterX - 200, CenterY  });
+        Speaker.setPosition({ CenterX - 200, CenterY });
 
         // Positions of MusicBar and Volume
         MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
@@ -634,21 +705,21 @@ int main(){
 
         // Positions of the TestSound is left at default (top left).
 
-        ResolutionModeText.setPosition({ MusicSymbol.getPosition().x, MusicSymbol.getPosition().y - 100});
+        ResolutionModeText.setPosition({ MusicSymbol.getPosition().x, MusicSymbol.getPosition().y - 100 });
         ResolutionModeButton.setPosition(ResolutionModeText.getPosition());
 
         WindowModeUp.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y });
         WindowModeDown.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y + 40 });
-        
+
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Other windows that share buttons.
         //------------------------------------------------------------------------------------------------------------------------------------------
 
         if (isOptions) {
-            ReturnText.setPosition({ CenterX, CenterY + 100});
+            ReturnText.setPosition({ CenterX, CenterY + 100 });
             ReturnButton.setPosition(ReturnText.getPosition());
         }
-        
+
         if (isPlay) {
             ReturnText.setPosition({ 0,0 });
             ReturnButton.setPosition(ReturnText.getPosition());
@@ -670,7 +741,7 @@ int main(){
 
         QuitButton.setPosition({ CenterX, CenterY });
         QuitText.setPosition({ CenterX, CenterY });
-        
+
         //PreviousText.setString(to_string(PreviousScreen));
         //PreviousText.setPosition({ 300, 300 });
 
@@ -732,14 +803,14 @@ int main(){
         }
 
         if (isPlay) {
-            Game.draw(Puzzle);
+            Game.draw(piece);
             Game.draw(PuzzleText);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
         }
-        Game.display();  
+        Game.display();
     }
 }
 
