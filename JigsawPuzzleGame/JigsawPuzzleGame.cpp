@@ -73,9 +73,9 @@ public:
 
 private:
     std::vector<sf::RectangleShape> blocks;
-    float blockSize;
-    sf::Color color;
-    const std::vector<sf::Vector2i>* shape;
+    float blockSize;                        // set by constructor
+    sf::Color color;                        // |
+    const std::vector<sf::Vector2i>* shape; // |
 
     // method to choose puzzle piece
     static const std::vector<sf::Vector2i>* getShape(int num) { 
@@ -146,9 +146,12 @@ int main() {
     auto backgroundHelper = [&Game, &bg, &renderFlag]() { // lambda function to draw the background
         sf::Texture current = bg.getBackground();
         sf::Sprite bgSprite(current);
-        bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
+
+        if (renderFlag) { // prevents calc unless screen size has changed
+            bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
+            renderFlag = false;
+        }
         Game.draw(bgSprite);
-        renderFlag = false;
     };
 
 
@@ -360,7 +363,7 @@ int main() {
         }
         };
 
-    pieceMaker({ 0, 1, 2, 3 });
+    pieceMaker({ 0, 1, 2, 3, 0, 1, 2, 3 });
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -898,7 +901,7 @@ int main() {
         }
 
         if (isOptions) {
-			backgroundHelper();
+            backgroundHelper(); 
             Game.draw(Speaker);
             Game.draw(SoundBar2);
             Game.draw(SoundBar);
