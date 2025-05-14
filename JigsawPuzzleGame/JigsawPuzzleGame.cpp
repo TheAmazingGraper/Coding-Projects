@@ -141,18 +141,18 @@ int main() {
     // Backgrounds
     //------------------------------------------------------------------------------------------------------------------------------------------
     Background bg;
-	bool renderFlag = true; // flag to check if the background needs to be redrawn
 
-    auto backgroundHelper = [&Game, &bg, &renderFlag]() { // lambda function to draw the background
+    auto drawBackground = [&Game, &bg](bool renderFlag) { // lambda function to draw the background
         sf::Texture current = bg.getBackground();
         sf::Sprite bgSprite(current);
 
-        if (renderFlag) { // prevents calc unless screen size has changed
+        if (renderFlag) {
             bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
-            renderFlag = false;
         }
-        Game.draw(bgSprite);
-    };
+
+            Game.draw(bgSprite);
+        
+        };
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -571,7 +571,7 @@ int main() {
                 // Left click to activate 800x600.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 800, 600 }), "Options", sf::State::Windowed);
-					renderFlag = true; // set the flag to true to redraw the background to the correct size
+                    drawBackground(true); // draw and resize background
                 }
             }
             else {
@@ -585,7 +585,7 @@ int main() {
                 // Left click to activate Text1280x720Button.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 1280, 720 }), "Options", sf::State::Windowed);
-                    renderFlag = true; // set the flag to true to redraw the background to the correct size
+                    drawBackground(true); // draw and resize background
 
                 }
             }
@@ -600,7 +600,7 @@ int main() {
                 // Left click to activate Text1920x1080Button.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 1920, 1080 }), "Options", sf::State::Windowed);
-                    renderFlag = true; // set the flag to true to redraw the background to the correct size
+                    drawBackground(true); // draw and resize background
 
                 }
             }
@@ -615,7 +615,7 @@ int main() {
                 // Left click to activate FullScreenMode.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode::getFullscreenModes()[0], "Options", sf::Style::None, sf::State::Fullscreen);
-                    renderFlag = true; // set the flag to true to redraw the background to the correct size
+                    drawBackground(true); // draw and resize background
                 }
             }
             else {
@@ -890,7 +890,7 @@ int main() {
 
 
         if (isMainMenu) {
-            backgroundHelper();
+            drawBackground(false); // just draw background; do not resize
             Game.draw(QuitButton);
             Game.draw(QuitText);
             Game.draw(OptionsButton);
@@ -901,7 +901,7 @@ int main() {
         }
 
         if (isOptions) {
-            backgroundHelper(); 
+            drawBackground(false); // just draw background; do not resize
             Game.draw(Speaker);
             Game.draw(SoundBar2);
             Game.draw(SoundBar);
@@ -943,7 +943,7 @@ int main() {
         }
 
         if (isPlay) {
-            backgroundHelper();
+            drawBackground(false); // just draw background; do not resize
             drawPieces();
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
