@@ -14,37 +14,47 @@ using namespace std;
 #include <algorithm>
 
 
-class TetrisPiece : public sf::Drawable, public sf::Transformable {
+class PuzzlePiece : public sf::Drawable, public sf::Transformable {
 public:
-    TetrisPiece(const std::vector<sf::Vector2i>& shape, float blockSize, sf::Color color = sf::Color::Blue)
-        : blockSize(blockSize), color(color) {
-        for (const auto& coord : shape) {
-            sf::RectangleShape block(sf::Vector2f(blockSize, blockSize));
+
+
+    static const std::vector<sf::Vector2i> L;
+    static const std::vector<sf::Vector2i> T;
+    static const std::vector<sf::Vector2i> plus;
+    static const std::vector<sf::Vector2i> minus;
+
+    PuzzlePiece(int num, float blockSize, sf::Color color = sf::Color::Blue)
+        : blockSize(blockSize), color(color), shape(getShape(num)) {
+       
+        // build shape
+        for (const auto& coord : *shape) {
+            sf::RectangleShape block(sf::Vector2f(blockSize, blockSize)); // building block (small sqaure)
             block.setFillColor(color);
             block.setOrigin(sf::Vector2f(blockSize / 2.f, blockSize / 2.f));
-            block.setPosition(sf::Vector2f(static_cast<float>(coord.x) * blockSize,
-                static_cast<float>(coord.y) * blockSize));
-            blocks.push_back(block);
+            block.setPosition(sf::Vector2f(static_cast<float>(coord.x) * blockSize, static_cast<float>(coord.y) * blockSize)); // uses our vector notation to offset blocks
+            blocks.push_back(block); // adds the block to our vector of rectangle shapes "blocks"
         }
     }
 
+    // allows .setFillColor()
     void setFillColor(const sf::Color& newColor) {
         color = newColor;
         for (auto& block : blocks) {
-            block.setFillColor(color);
+            block.setFillColor(color); // fills each building block of the shape the new color
         }
     }
 
+    //allows .getGlobalBounds()
     sf::FloatRect getGlobalBounds() const {
         if (blocks.empty()) return {};
 
         float minX = std::numeric_limits<float>::max();
         float minY = std::numeric_limits<float>::max();
         float maxX = std::numeric_limits<float>::lowest();
-        float maxY = std::numeric_limits<float>::lowest();
+        float maxY = std::numeric_limits<float>::lowest(); 
 
         for (const auto& block : blocks) {
-            sf::Transform totalTransform = getTransform() * block.getTransform();
+            sf::Transform totalTransform = getTransform() * block.getTransform(); 
             sf::FloatRect rect = totalTransform.transformRect(block.getLocalBounds());
 
             minX = std::min<float>(minX, rect.position.x);
@@ -64,14 +74,32 @@ private:
     std::vector<sf::RectangleShape> blocks;
     float blockSize;
     sf::Color color;
+    const std::vector<sf::Vector2i>* shape;
+
+    // method to choose puzzle piece
+    static const std::vector<sf::Vector2i>* getShape(int num) { 
+        switch (num) {
+        case 0: return &L;
+        case 1: return &T;
+        case 2: return &plus;
+        case 3: return &minus;
+        default: return &L;
+        } // needs implementation without switch
+    }
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
         states.transform *= getTransform();
         for (const auto& block : blocks) {
-            target.draw(block, states);
+            target.draw(block, states); // draw each block in blocks
         }
     }
 };
+
+
+const std::vector<sf::Vector2i> PuzzlePiece::L = { {0,0}, {1,0}, {1,1} }; // shape 0
+const std::vector<sf::Vector2i> PuzzlePiece::T = { {0,0}, {1,0}, {2,0}, {1,1} }; // shape 1
+const std::vector<sf::Vector2i> PuzzlePiece::plus = { {0,1}, {1,0}, {1,1}, {2,1}, {1,2} }; // shape 2
+const std::vector<sf::Vector2i> PuzzlePiece::minus = { {0,0}, {1,0} }; // shape 3
 
 
 int main() {
@@ -220,12 +248,12 @@ int main() {
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
-    // Puzzle Piece
+    // Puzzle Pieces
     //------------------------------------------------------------------------------------------------------------------------------------------
-   // sf::RectangleShape Puzzle(PuzzleText.getGlobalBounds().size);
-    //Puzzle.setOrigin({ Puzzle.getSize().x / 2, Puzzle.getSize().y / 2 });
-   // Puzzle.setPosition({ 300, 400 });
-    TetrisPiece piece({ {0,0}, {1,0}, {0,1} }, 30.0f, sf::Color::Blue);
+    
+    //need to create a piece crafter class
+    // craft a puzzle piece: (shape, length of side, color)
+    PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue);
     piece.setPosition({ 300, 400 });
     piece.setRotation(NorthAngle);
 
