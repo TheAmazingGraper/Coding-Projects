@@ -1,9 +1,19 @@
 ﻿  JigsawPuzzleGame.cpp
-D:\School\Spring 2025\Spring 2025 Software Engineering (CPSC-4360-01)\JigsawPuzzleGame\External\SFML\include\SFML\System\Exception.hpp(41,47): warning C4275: non dll-interface class 'std::runtime_error' used as base for dll-interface class 'sf::Exception'
+C:\Users\drake\Source\Repos\Coding-Projects\JigsawPuzzleGame\External\SFML\include\SFML\System\Exception.hpp(41,47): warning C4275: non dll-interface class 'std::runtime_error' used as base for dll-interface class 'sf::Exception'
   (compiling source file 'JigsawPuzzleGame.cpp')
       C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\stdexcept(100,19):
       see declaration of 'std::runtime_error'
-      D:\School\Spring 2025\Spring 2025 Software Engineering (CPSC-4360-01)\JigsawPuzzleGame\External\SFML\include\SFML\System\Exception.hpp(41,23):
+      C:\Users\drake\Source\Repos\Coding-Projects\JigsawPuzzleGame\External\SFML\include\SFML\System\Exception.hpp(41,23):
       see declaration of 'sf::Exception'
   
-  JigsawPuzzleGame.vcxproj -> D:\School\Spring 2025\Spring 2025 Software Engineering (CPSC-4360-01)\JigsawPuzzleGame\Debug\JigsawPuzzleGame.exe
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(115,35): warning C4834: discarding return value of function with [[nodiscard]] attribute
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(116,35): warning C4834: discarding return value of function with [[nodiscard]] attribute
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(117,35): warning C4834: discarding return value of function with [[nodiscard]] attribute
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(118,35): warning C4834: discarding return value of function with [[nodiscard]] attribute
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(183,24): warning C4390: ';': empty controlled statement found; is this the intent?
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(472,23): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(473,23): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(576,71): warning C4018: '<': signed/unsigned mismatch
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(764,37): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\drake\source\repos\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(803,37): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  JigsawPuzzleGame.vcxproj -> C:\Users\drake\Source\Repos\Coding-Projects\JigsawPuzzleGame\Debug\JigsawPuzzleGame.exe
