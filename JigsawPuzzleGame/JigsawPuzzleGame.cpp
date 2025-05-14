@@ -126,6 +126,13 @@ public:
     }
 };
 
+class Level {
+public:
+    int level;
+    bool LevelClear;
+
+};
+
 
 int main() {
 
@@ -876,6 +883,11 @@ int main() {
         Puzzle2Bounds.setPosition(piece2.getPosition());
         Puzzle3Bounds.setPosition(piece3.getPosition());
         Puzzle4Bounds.setPosition(piece4.getPosition());
+
+        Puzzle1Bounds.setRotation(piece.getRotation());
+        Puzzle2Bounds.setRotation(piece2.getRotation());
+        Puzzle3Bounds.setRotation(piece3.getRotation());
+        Puzzle4Bounds.setRotation(piece4.getRotation());
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
