@@ -282,8 +282,9 @@ int main() {
     sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
-    sf::RectangleShape SolutionBox({ 30,30 });
-    sf::FloatRect Checker;
+    sf::RectangleShape SolutionBox({ 300,300 });
+    SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y });
+
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
     WindowModeDown.rotate(sf::degrees(180));
