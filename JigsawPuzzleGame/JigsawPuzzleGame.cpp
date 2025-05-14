@@ -106,7 +106,6 @@ int main(){
     sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
-
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius()});
     WindowModeDown.rotate(sf::degrees(180));
@@ -118,7 +117,12 @@ int main(){
     Puzzle.setOrigin({ Puzzle.getSize().x / 2, Puzzle.getSize().y / 2 });
     Puzzle.setPosition({ 300, 400 });
 
-
+    sf::CircleShape Puzzle2(20.f, 3);
+    Puzzle2.setOrigin({ Puzzle2.getRadius(), Puzzle2.getRadius() });
+    Puzzle2.setPosition({ 200, 200 });
+    
+    //sf::RectangleShape Puzzle2Button(Puzzle2.getGlobalBounds().size);
+    sf::CircleShape Puzzle2Button(Puzzle2);
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sound bars and shapes
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -181,8 +185,14 @@ int main(){
     // Single Mouse click
     bool click = true;
 
+    // Holding a puzzle piece.
+    bool HoldingPuzzle = 0;
+    sf::Text HoldingPuzzleText(font);
+    HoldingPuzzleText.setPosition({ 300,400 });
+
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
+
         // Volumes of both sound and music. (also convert the float into int)
         int Volume = (int)SoundBar.getSize().x / 3;
         int MusicVolume = (int)MusicBar.getSize().x / 3;
@@ -206,7 +216,7 @@ int main(){
             Screen = 0;
 
             // PlayButton Changes to red when mouse hover.
-            if (PlayButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (PlayButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 PlayButton.setFillColor(sf::Color::Red);
 
                 // Left click to change window to Play window.
@@ -223,7 +233,7 @@ int main(){
             }
 
             // OptionsButton Changes to red when mouse hover.
-            if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 OptionsButton.setFillColor(sf::Color::Red);
 
                 // Left click changes window to Options window.
@@ -240,7 +250,7 @@ int main(){
             }
 
             // Quit Button Changes to red when mouse hover.
-            if (QuitButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (QuitButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 QuitButton.setFillColor(sf::Color::Red);
 
                 // Left click to quit Game window.
@@ -262,13 +272,30 @@ int main(){
         if (isPlay) {
             Screen = 2;
 
+         /*
+            if (Puzzle.getPosition().y > 600)
+                Puzzle.setPosition({ Puzzle.getPosition().x, 0 });
+
+            if (Puzzle.getGlobalBounds().contains(Puzzle2.getGlobalBounds().position)) {
+                
+                while (Puzzle.getGlobalBounds().contains(Puzzle2.getGlobalBounds().position)) {
+                    Puzzle.move({ 0,1 });
+                }
+            }else{
+               // Puzzle.move({ 0,1 });
+            }*/
+                
+
             // Puzzle Changes to red when mouse hover.
-            if (Puzzle.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+
+            if (Puzzle.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 Puzzle.setFillColor(sf::Color::Red);
 
                 // Left click and move to drag the puzzle piece.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                   
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)  ) {
+                    
+                    HoldingPuzzle = true;
+
                     Puzzle.setPosition({ (float)localPosition.x , (float)localPosition.y });
 
                     //Change the rotation of the Puzzle piece.
@@ -293,8 +320,41 @@ int main(){
                 Puzzle.setFillColor(sf::Color::Blue);
             }
 
+            // Puzzle2 Changes to red when mouse hover.
+
+            if (Puzzle2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
+                Puzzle2.setFillColor(sf::Color::Red);
+
+                // Left click and move to drag the Puzzle2 piece.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                    HoldingPuzzle = true;
+                    Puzzle2.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                    //Change the rotation of the Puzzle piece.
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                        Puzzle2.setRotation(WestAngle);
+                    }
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                        Puzzle2.setRotation(NorthAngle);
+                    }
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                        Puzzle2.setRotation(SouthAngle);
+                    }
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                        Puzzle2.setRotation(EastAngle);
+                    }
+                }
+            }
+            else {
+                Puzzle2.setFillColor(sf::Color::Blue);
+            }
+
             // OptionsButton Changes to red when mouse hover.
-            if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 OptionsButton.setFillColor(sf::Color::Red);
 
                 // Left click changes window to Options window.
@@ -311,7 +371,7 @@ int main(){
             }
 
             // ReturnButton Button Changes to red when mouse hover.
-            if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 ReturnButton.setFillColor(sf::Color::Red);
 
                 // Left click to activate ReturnButton.
@@ -338,7 +398,7 @@ int main(){
             }
 
             // MainMenuButton Changes to red when mouse hover.
-            if (MainMenuButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (MainMenuButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 MainMenuButton.setFillColor(sf::Color::Red);
 
                 // Left click to play test sound.
@@ -362,7 +422,7 @@ int main(){
             Screen = 1;
 
             // Test800x600Button Changes to red when mouse hover.
-            if (Text800x600Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 0) {
+            if (Text800x600Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && ResolutionModes % 4 == 0) {
                 Text800x600Button.setFillColor(sf::Color::Red);
 
                 // Left click to activate 800x600.
@@ -375,7 +435,7 @@ int main(){
             }
 
             // Text1280x720Button Changes to red when mouse hover.
-            if (Text1280x720Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 1) {
+            if (Text1280x720Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && ResolutionModes % 4 == 1) {
                 Text1280x720Button.setFillColor(sf::Color::Red);
 
                 // Left click to activate Text1280x720Button.
@@ -388,7 +448,7 @@ int main(){
             }
 
             // Text1920x1080Button Changes to red when mouse hover.
-            if (Text1920x1080Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 2) {
+            if (Text1920x1080Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })  && ResolutionModes % 4 == 2) {
                 Text1920x1080Button.setFillColor(sf::Color::Red);
 
                 // Left click to activate Text1920x1080Button.
@@ -401,7 +461,7 @@ int main(){
             }
 
             // FullScreenButton Changes to red when mouse hover.
-            if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 3) {
+            if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })  && ResolutionModes % 4 == 3) {
                 FullScreenButton.setFillColor(sf::Color::Red);
 
                 // Left click to activate FullScreenMode.
@@ -414,7 +474,7 @@ int main(){
             }
 
             //I have to use the SoundBar2 for the global bounds, since SoundBar changes.
-            if (SoundBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (SoundBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 SoundCircle.setPosition({ (float)localPosition.x - 10, SoundBar.getPosition().y });
                 SoundCircle.setFillColor(sf::Color::White);
                 Game.draw(SoundCircle);
@@ -439,7 +499,7 @@ int main(){
             }
 
             // TestSound Button Changes to red when mouse hover.
-            if (TestSoundButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (TestSoundButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 TestSoundButton.setFillColor(sf::Color::Red);
 
                 // Left click to play test sound.
@@ -452,7 +512,7 @@ int main(){
             }
 
             // MusicBar (Same thing as the SoundBar, but this one control the volume of the music).
-            if (MusicBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (MusicBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 SoundCircle2.setPosition({ (float)localPosition.x - 10, MusicBar2.getPosition().y });
                 SoundCircle2.setFillColor(sf::Color::White);
                 Game.draw(SoundCircle2);
@@ -478,7 +538,7 @@ int main(){
             }
 
             // ReturnButton Button Changes to red when mouse hover.
-            if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 ReturnButton.setFillColor(sf::Color::Red);
 
                 // Left click to activate ReturnButton.
@@ -505,7 +565,7 @@ int main(){
             }
 
             // WindowModeButton is not a button.
-            if (ResolutionModeButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (ResolutionModeButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 //Empty
             }
             else {
@@ -513,7 +573,7 @@ int main(){
             }
 
             // WindowModeUp Button Changes to red when mouse hover.
-            if (WindowModeUp.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (WindowModeUp.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 WindowModeUp.setFillColor(sf::Color::Red);
 
                 // Left click to activate WindowModeUp.
@@ -528,7 +588,7 @@ int main(){
             }
 
             // WindowModeDown Button Changes to red when mouse hover.
-            if (WindowModeDown.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            if (WindowModeDown.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                 WindowModeDown.setFillColor(sf::Color::Red);
 
                 // Left click to activate WindowModeDown.
@@ -549,7 +609,10 @@ int main(){
 
             if (event->is < sf::Event::MouseButtonReleased>()) {
                 click = true;
+                HoldingPuzzle = false;
             }
+
+
 
             // "close requested" event: we close the window
             if (event->is<sf::Event::Closed>()) {
@@ -576,13 +639,18 @@ int main(){
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Play objects.
         //------------------------------------------------------------------------------------------------------------------------------------------ 
+
+        MainMenuText.setPosition({ 0, 0 });
+        MainMenuButton.setPosition(MainMenuText.getPosition());
+
         // Position of puzzle pieces
         PuzzleText.setPosition(Puzzle.getPosition());
         PuzzleText.setRotation(Puzzle.getRotation());
         PuzzleText.setOrigin(Puzzle.getOrigin());
 
-        MainMenuText.setPosition({ 0, 0 });
-        MainMenuButton.setPosition(MainMenuText.getPosition());
+        Puzzle2Button.setPosition(Puzzle2.getPosition());
+        Puzzle2Button.setOrigin(Puzzle2.getOrigin());
+        //Puzzle2Button.setRotation(Puzzle2.getRotation());
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -615,8 +683,7 @@ int main(){
         FullScreenText.setPosition(transformedPosition3);
         FullScreenButton.setPosition(transformedPosition3);
 
-
-
+        // Positions of SoundBar and Volume
         // Positions of SoundBar and Volume
         VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
         Speaker.setPosition({ CenterX - 200, CenterY  });
@@ -673,13 +740,10 @@ int main(){
         
         //PreviousText.setString(to_string(PreviousScreen));
         //PreviousText.setPosition({ 300, 300 });
-
+        HoldingPuzzleText.setString(to_string(HoldingPuzzle));
         //Order matters when drawing objects.
         Game.clear();
-
-
-
-
+        Game.draw(HoldingPuzzleText);
         if (isMainMenu) {
             Game.draw(QuitButton);
             Game.draw(QuitText);
@@ -732,12 +796,14 @@ int main(){
         }
 
         if (isPlay) {
-            Game.draw(Puzzle);
-            Game.draw(PuzzleText);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
+            Game.draw(Puzzle);
+            Game.draw(PuzzleText);
+            Game.draw(Puzzle2Button);
+            Game.draw(Puzzle2);
         }
         Game.display();  
     }
