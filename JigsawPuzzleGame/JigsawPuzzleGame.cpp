@@ -523,37 +523,58 @@ int main() {
         if (isPlay) {
             Screen = 2;
 
-            bool holdingPiece = false;
+            static bool holdingPiece = false;
+            static int heldPieceIndex = -1;
 
-            // Puzzle Changes to red when mouse hover.
-            for (auto& piece : pieces) {
-                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && isPlay && !holdingPiece) {
+            // Reverse iterate to prioritize topmost pieces
+            for (int i = static_cast<int>(pieces.size()) - 1; i >= 0; --i) {
+                PuzzlePiece& piece = pieces[i];
+
+                if (!holdingPiece && piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                     piece.setFillColor(sf::Color::Red);
 
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        // Pick up the piece
                         holdingPiece = true;
-                        piece.setPosition({ (float)localPosition.x, (float)localPosition.y });
+                        heldPieceIndex = i;
 
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                            piece.setRotation(WestAngle);
-                        }
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                            piece.setRotation(NorthAngle);
-                        }
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                            piece.setRotation(SouthAngle);
-                        }
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                            piece.setRotation(EastAngle);
-                        }
-                    }
-                    else {
-                        holdingPiece = false;
+                        // Move it to the back so it draws last
+                        PuzzlePiece held = piece;
+                        pieces.erase(pieces.begin() + i);
+                        pieces.push_back(held);
+                        heldPieceIndex = static_cast<int>(pieces.size()) - 1;
+                        break; // stop after picking one
                     }
                 }
                 else {
                     piece.setFillColor(sf::Color::Blue);
                 }
+            }
+
+            // If holding a piece, follow the mouse and rotate
+            if (holdingPiece && heldPieceIndex >= 0 && heldPieceIndex < pieces.size()) {
+                PuzzlePiece& heldPiece = pieces[heldPieceIndex];
+                heldPiece.setPosition({ (float)localPosition.x, (float)localPosition.y });
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                    heldPiece.setRotation(WestAngle);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                    heldPiece.setRotation(NorthAngle);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                    heldPiece.setRotation(SouthAngle);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                    heldPiece.setRotation(EastAngle);
+                }
+
+                // Optional: release on mouse release
+                if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    holdingPiece = false;
+                    heldPieceIndex = -1;
+                }
+
             }
 
 
