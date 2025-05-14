@@ -140,10 +140,16 @@ public:
 int main() {
     // Initializing level class
     Level ClassLevel;
-
+    
     //Loading save file
     if (filesystem::exists("savefile.txt")) {
-        ifstream("savefile.txt");
+        ifstream inputSave("savefile.txt");
+        inputSave.open("savefile.txt");
+       
+        inputSave >> ClassLevel.Level;
+        inputSave >> ClassLevel.LevelClear; // Read the data
+
+        inputSave.close();
     }
     else {
         ClassLevel.Level = 0;
