@@ -242,6 +242,9 @@ int main() {
     sf::Text LevelClearText(font);
     LevelClearText.setString("Level Clear!");
 
+    sf::Text CollisionText(font);
+    CollisionText.setString("Collision!");
+
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -283,7 +286,7 @@ int main() {
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
     sf::RectangleShape SolutionBox({ 300,300 });
-    SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y });
+    SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y / 2 });
 
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
@@ -447,6 +450,9 @@ int main() {
     // Single Mouse click
     bool click = true;
 
+    // Has collisions.
+    bool hasCollision = false;
+
     // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
     //bool HoldingPiece = false;
     //int HoldingPieceNum = 0;
@@ -605,12 +611,22 @@ int main() {
             // They will not change color, but it will work eventually.
             for (int i = static_cast<int>(pieces.size()) - 1; i >= 1; --i) {
                 PuzzlePiece& piece = pieces[i];
-                if (pieces[i].getGlobalBounds().findIntersection(pieces[i-1].getGlobalBounds())) {
+                if (pieces[i].getGlobalBounds().findIntersection(pieces[i - 1].getGlobalBounds())) {
                     pieces[i].setFillColor(sf::Color::Magenta);
-                    pieces[i-1].setFillColor(sf::Color::Magenta);
-                }
+                    pieces[i - 1].setFillColor(sf::Color::Magenta);
+                    hasCollision = true;
+                }hasCollision = false;
+                
+
+                
+                // When inside boundrary of solution box pieces become black
+                if (SolutionBox.getGlobalBounds().contains(pieces[i].getGlobalBounds().position))
+                    pieces[i].setFillColor(sf::Color::Black);
+
                    
             }
+
+           
             for (int i = 1; i < static_cast<int>(pieces.size()); ++i) {
                 PuzzlePiece& piece1 = pieces[i - 1];
                 PuzzlePiece& piece2 = pieces[i];
@@ -930,6 +946,7 @@ int main() {
 
         SolutionBox.setPosition({ CenterX, CenterY });
         LevelClearText.setPosition({ CenterX,CenterY - 200 });
+        CollisionText.setPosition({ CenterX, CenterY -300});
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -1082,7 +1099,6 @@ int main() {
 
         if (isPlay) {
             backgroundHelper();
-            drawPieces();
             Game.draw(SolutionBox);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
@@ -1091,8 +1107,10 @@ int main() {
 
 
             //if(SolutionBox.getGlobalBounds().findIntersection())
+            if(hasCollision)
+                Game.draw(CollisionText);
             Game.draw(LevelClearText);
-            
+            drawPieces();
         }
         Game.display();
 
