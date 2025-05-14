@@ -449,27 +449,7 @@ int main() {
             }*/
 
             // Puzzle Changes to red when mouse hover.
-<<
 
-                    HoldingPuzzle2 = true;
-
-
-
-                    //if (HoldingPuzzlesPieces <= 1 )
-                    //if(HoldingPuzzle2 && !HoldingPuzzle && !HoldingPuzzle3)
-                    //if (HoldingPuzzle2 && !HoldingPuzzle)
-                        //if (HoldingPuzzle2 && !HoldingPuzzle3)
-
-                    while(HoldingPuzzle2) {
-                        if (click) {
-                            HoldingPuzzle2 = false;
-                        }
-                    Puzzle2.setPosition({ (float)localPosition.x , (float)localPosition.y });
-
-                    //Change the rotation of the Puzzle2 piece.
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-<<<<<
-            }
 
             // OptionsButton Changes to red when mouse hover.
             if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
@@ -774,9 +754,6 @@ int main() {
         PuzzleText.setRotation(piece.getRotation());
         PuzzleText.setOrigin(piece.getOrigin());
 
-        Puzzle2Button.setPosition(Puzzle2.getPosition());
-        Puzzle2Button.setOrigin(Puzzle2.getOrigin());
-        //Puzzle2Button.setRotation(Puzzle2.getRotation());
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -938,11 +915,8 @@ int main() {
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
-            Game.draw(Puzzle);
             Game.draw(PuzzleText);
-            Game.draw(Puzzle2Button);
-            Game.draw(Puzzle2);
-            Game.draw(Puzzle3);
+
         }
         Game.display();
     }
