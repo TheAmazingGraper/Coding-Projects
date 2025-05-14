@@ -293,12 +293,12 @@ int main() {
     
     //need to create a piece crafter class
     // craft a puzzle piece: (shape, length of side, color)
-    PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
+    PuzzlePiece piece(0, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
     piece.setPosition({ 300, 400 });
     piece.setRotation(NorthAngle);
     piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
 
-    PuzzlePiece piece2(1, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
+    PuzzlePiece piece2(0, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
     piece2.setPosition({ 400, 400 });
     piece2.setRotation(NorthAngle);
     piece2.setOrigin({ piece2.getGlobalBounds().size.x / 3.f, piece2.getGlobalBounds().size.y / 2.f });
@@ -346,11 +346,6 @@ int main() {
 
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
-
-        // Holding pieces.
-        HoldingPiece = false;
-        HoldingPieceNum = 0;
-
 
         // Volumes of both sound and music. (also convert the float into int)
         int Volume = (int)SoundBar.getSize().x / 3;
@@ -533,6 +528,10 @@ int main() {
                 else {
                     piece3.setFillColor(sf::Color::Blue);
                 }
+
+            // Holding pieces.
+            HoldingPiece = false;
+            HoldingPieceNum = 0;
 
             if (HoldingPiece) {
                 HoldingPieceText.setString("True");
@@ -989,39 +988,16 @@ int main() {
 
         if (isPlay) {
             backgroundHelper();
-            //Game.draw(piece);
-            //Game.draw(piece2);
-            //Game.draw(piece3);
-            //Game.draw(PuzzleText);
+            Game.draw(piece);
+            Game.draw(piece2);
+            Game.draw(piece3);
+            Game.draw(PuzzleText);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
             Game.draw(HoldText);
             Game.draw(HoldingPieceText);
-
-            if (HoldingPiece) {
-                if (HoldingPieceNum == 1) {
-                    Game.draw(piece3);
-                    Game.draw(piece2);
-                    Game.draw(piece);
-                }
-                if (HoldingPieceNum == 2) {
-                    Game.draw(piece3);
-                    Game.draw(piece);
-                    Game.draw(piece2);
-                }
-                if (HoldingPieceNum == 3) {
-                    Game.draw(piece);
-                    Game.draw(piece2);
-                    Game.draw(piece3);
-                }
-            }
-            else {
-                Game.draw(piece);
-                Game.draw(piece2);
-                Game.draw(piece3);
-            }
 
         }
         Game.display();
