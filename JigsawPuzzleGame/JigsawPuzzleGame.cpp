@@ -179,7 +179,7 @@ int main() {
         auto backgroundHelper = [&Game, &bg, &renderFlag]() { // lambda function to draw the background
             sf::Texture current = bg.getBackground();
             sf::Sprite bgSprite(current);
-            bgSprite.setScale({ 30,30 });
+            bgSprite.setScale({ 30.f,30.f });
             //bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
             Game.draw(bgSprite);
             renderFlag = false;
@@ -239,6 +239,9 @@ int main() {
         sf::Text LevelClearText(font);
         LevelClearText.setString("Level Clear!");
 
+        sf::Text testText(font);
+        testText.setPosition({ 250, 200 });
+
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Sprite Objects
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -279,7 +282,7 @@ int main() {
         sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
         sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
-        sf::RectangleShape SolutionBox({ 30,30 });
+        sf::RectangleShape SolutionBox({ 80,40 });
         sf::FloatRect Checker;
         WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
         WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
@@ -1025,6 +1028,8 @@ int main() {
             //PreviousText.setString(to_string(PreviousScreen));
             //PreviousText.setPosition({ 300, 300 });
 
+            testText.setString(to_string(piece.getBlockSize()));
+
             //Order matters when drawing objects.
             Game.clear();
 
@@ -1100,8 +1105,9 @@ int main() {
                 Game.draw(OptionsText);
                 Game.draw(MainMenuButton);
                 Game.draw(MainMenuText);
+                Game.draw(testText);
                 
-                //if (SolutionBox.getGlobalBounds().findIntersection(piece.getGlobalBounds()) && SolutionBox.getSize() == piece.getBlockSize())
+                if (SolutionBox.getGlobalBounds().findIntersection(piece4.getGlobalBounds()))
                     Game.draw(LevelClearText);
 
             }
