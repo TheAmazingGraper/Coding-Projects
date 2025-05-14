@@ -12,6 +12,7 @@ using namespace std;
 #include <vector>
 #include <limits>
 #include <algorithm>
+#include <random>
 
 
 class PuzzlePiece : public sf::Drawable, public sf::Transformable {
@@ -293,20 +294,73 @@ int main() {
     
     //need to create a piece crafter class
     // craft a puzzle piece: (shape, length of side, color)
-    PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
-    piece.setPosition({ 300, 400 });
-    piece.setRotation(NorthAngle);
-    piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
+    //PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
+    //piece.setPosition({ 300, 400 });
+    //piece.setRotation(NorthAngle);
+    //piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
 
-    PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
-    piece2.setPosition({ 400, 400 });
-    piece2.setRotation(NorthAngle);
-    piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
+    //PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
+    //piece2.setPosition({ 400, 400 });
+    //piece2.setRotation(NorthAngle);
+    //piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
 
     // shape 0 = L
     // shape 1 = T
     // shape 2 = plus
     // shape 3 = minus
+    
+    std::vector<PuzzlePiece> pieces;
+    
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<int> xDist(100, 200);
+    std::uniform_int_distribution<int> yDist(100, Game.getSize().y);
+    std::uniform_int_distribution<int> angleDist(0, 3);
+
+    auto pieceMaker = [&](const std::vector<int>& shapeIds) {
+        float blockSize = 30;
+        sf::Color color = sf::Color::Blue;
+
+        for (int shapeId : shapeIds) {
+            pieces.emplace_back(shapeId, blockSize, color);
+            PuzzlePiece& piece = pieces.back();
+
+            piece.setPosition({
+                static_cast<float>(xDist(rng)),
+                static_cast<float>(yDist(rng))
+                });
+
+            sf::FloatRect bounds = piece.getGlobalBounds();
+            switch (shapeId) {
+            case 0: // L-shape
+                piece.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 8.f });
+                break;
+            case 1: // T-shape // -
+                piece.setOrigin({ bounds.size.x / 2.666f, bounds.size.y / 3.f });
+                break;
+            case 2: // Plus-shape
+                piece.setOrigin({ bounds.size.x / 2.6667f, bounds.size.y / 2.6667f });
+                break;
+            case 3: // minus-shape
+                piece.setOrigin({ bounds.size.x / 4.f, bounds.size.y / 8.f});
+                break;
+            }
+
+            switch (angleDist(rng)) {
+            case 0: piece.setRotation(NorthAngle); break;
+            case 1: piece.setRotation(EastAngle); break;
+            case 2: piece.setRotation(SouthAngle); break;
+            case 3: piece.setRotation(WestAngle); break;
+            }
+        }
+        };
+
+    auto drawPieces = [&Game, &pieces]() { // lambda function to draw the background
+        for (const auto& piece : pieces) {
+            Game.draw(piece);
+        }
+        };
+
+    pieceMaker({ 0, 1, 2, 3 });
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -413,64 +467,30 @@ int main() {
             Screen = 2;
 
             // Puzzle Changes to red when mouse hover.
-            if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                piece.setFillColor(sf::Color::Red);
+            for (auto& piece : pieces) {
+                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && isPlay) {
+                    piece.setFillColor(sf::Color::Red);
 
-                // Left click and move to drag the puzzle piece.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        piece.setPosition({ (float)localPosition.x, (float)localPosition.y });
 
-                    piece.setPosition({ (float)localPosition.x , (float)localPosition.y });
-
-                    //Change the rotation of the Puzzle piece.
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                        piece.setRotation(WestAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                        piece.setRotation(NorthAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                        piece.setRotation(SouthAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                        piece.setRotation(EastAngle);
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                            piece.setRotation(WestAngle);
+                        }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                            piece.setRotation(NorthAngle);
+                        }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                            piece.setRotation(SouthAngle);
+                        }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                            piece.setRotation(EastAngle);
+                        }
                     }
                 }
-            }
-            else {
-                piece.setFillColor(sf::Color::Blue);
-            }
-
-            if (piece2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                piece2.setFillColor(sf::Color::Red);
-
-                // Left click and move to drag the puzzle piece2.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                    piece2.setPosition({ (float)localPosition.x , (float)localPosition.y });
-
-                    //Change the rotation of the Puzzle piece2.
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                        piece2.setRotation(WestAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                        piece2.setRotation(NorthAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                        piece2.setRotation(SouthAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                        piece2.setRotation(EastAngle);
-                    }
+                else {
+                    piece.setFillColor(sf::Color::Blue);
                 }
-            }
-            else {
-                piece2.setFillColor(sf::Color::Blue);
             }
 
             // OptionsButton Changes to red when mouse hover.
@@ -763,9 +783,9 @@ int main() {
         // Positions of Play objects.
         //------------------------------------------------------------------------------------------------------------------------------------------ 
         // Position of puzzle pieces
-        PuzzleText.setPosition(piece.getPosition());
-        PuzzleText.setRotation(piece.getRotation());
-        PuzzleText.setOrigin(piece.getOrigin());
+        //PuzzleText.setPosition(piece.getPosition());
+        //PuzzleText.setRotation(piece.getRotation());
+        //PuzzleText.setOrigin(piece.getOrigin());
 
         MainMenuText.setPosition({ 0, 0 });
         MainMenuButton.setPosition(MainMenuText.getPosition());
@@ -921,9 +941,7 @@ int main() {
 
         if (isPlay) {
             backgroundHelper();
-            Game.draw(piece);
-            Game.draw(piece2);
-            Game.draw(PuzzleText);
+            drawPieces();
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
