@@ -527,7 +527,7 @@ int main() {
 
             // Puzzle Changes to red when mouse hover.
             for (auto& piece : pieces) {
-                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && isPlay && !holdingPiece) {
+                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && !holdingPiece) {
                     piece.setFillColor(sf::Color::Red);
 
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
