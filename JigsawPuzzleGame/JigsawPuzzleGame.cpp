@@ -293,9 +293,15 @@ int main() {
     
     //need to create a piece crafter class
     // craft a puzzle piece: (shape, length of side, color)
-    PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue);
+    PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
     piece.setPosition({ 300, 400 });
     piece.setRotation(NorthAngle);
+    piece.setOrigin({ piece.getGlobalBounds().size.x/3, piece.getGlobalBounds().size.y/2});
+
+    // shape 0 = L
+    // shape 1 = T
+    // shape 2 = plus
+    // shape 3 = minus
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
