@@ -12,6 +12,9 @@ using namespace std;
 #include <vector>
 #include <limits>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 
 class PuzzlePiece : public sf::Drawable, public sf::Transformable {
@@ -128,935 +131,964 @@ public:
 
 class Level {
 public:
-    int level;
+    int Level;
     bool LevelClear;
 
 };
 
 
 int main() {
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Writing the real code for the project here.
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    //Opens a window the size of (800, 600).
-    sf::RenderWindow Game(sf::VideoMode({ 800, 600 }), "Main Menu");
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Backgrounds
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    Background bg;
-	bool renderFlag = true; // flag to check if the background needs to be redrawn
-
-    auto backgroundHelper = [&Game, &bg, &renderFlag]() { // lambda function to draw the background
-        sf::Texture current = bg.getBackground();
-        sf::Sprite bgSprite(current);
-        bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
-        Game.draw(bgSprite);
-        renderFlag = false;
-    };
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Fonts
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    sf::Font font("AGENCYR.ttf");
-    sf::Font font2("AGENCYB.ttf");
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Text Objects
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    sf::Text QuitText(font2);
-    QuitText.setString("Quit");
-
-    sf::Text VolumeText(font);
-
-    sf::Text TestSoundText(font);
-    TestSoundText.setString("TestSound");
-
-    sf::Text MusicVolumeText(font);
-
-    sf::Text PuzzleText(font);
-    PuzzleText.setString("Puzzle Piece");
-
-    sf::Text OptionsText(font);
-    OptionsText.setString("Options");
-
-    sf::Text PlayText(font);
-    PlayText.setString("Play");
-
-    sf::Text ReturnText(font);
-    ReturnText.setString("Return");
-
-    sf::Text MainMenuText(font);
-    MainMenuText.setString("Main Menu");
-
-    sf::Text ResolutionModeText(font);
-    ResolutionModeText.setString("Resolution Modes:");
-
-    sf::Text Text800x600(font);
-    Text800x600.setString("800x600");
-
-    sf::Text Text1280x720(font);
-    Text1280x720.setString("1280x720");
-
-    sf::Text Text1920x1080(font);
-    Text1920x1080.setString("1920x1080");
-
-    sf::Text FullScreenText(font);
-    FullScreenText.setString("Full Screen");
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Sprite Objects
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    //sf::Texture GrapeTexture("Grapes.png");
-    //sf::Sprite Grape(GrapeTexture);
-    //Grape.setColor(sf::Color::Blue);
-
-    // Sprite and texture.
-    sf::Texture SpeakerTexture("Speaker.png");
-    sf::Sprite Speaker(SpeakerTexture);
-    Speaker.setColor(sf::Color::White);
-    Speaker.setScale({ 0.25, 0.25 });
-
-    // Music Sprite and texture.
-    sf::Texture MusicTexture("TrebleClefBlack.png");
-    sf::Sprite MusicSymbol(MusicTexture);
-    MusicSymbol.setColor(sf::Color::White);
-    MusicSymbol.setScale({ 0.25, 0.25 });
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Buttons
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    sf::RectangleShape QuitButton(QuitText.getGlobalBounds().size); // Quit button
-    sf::RectangleShape FullScreenButton(FullScreenText.getGlobalBounds().size); //Fullscreen
-    sf::RectangleShape SoundBar({ 300, 20 }); //SoundBar is 300 pixel long.
-    sf::RectangleShape SoundBar2({ 300, 20 });
-    sf::RectangleShape TestSoundButton(TestSoundText.getGlobalBounds().size);
-    sf::RectangleShape MusicBar({ 300,20 });
-    sf::RectangleShape MusicBar2(MusicBar.getSize());
-    sf::RectangleShape OptionsButton(OptionsText.getGlobalBounds().size);
-    sf::RectangleShape PlayButton(PlayText.getGlobalBounds().size);
-    sf::RectangleShape ReturnButton(ReturnText.getGlobalBounds().size);
-    sf::RectangleShape MainMenuButton(MainMenuText.getGlobalBounds().size);
-    sf::RectangleShape ResolutionModeButton(ResolutionModeText.getGlobalBounds().size);
-    sf::CircleShape WindowModeUp(20.f, 3);
-    sf::CircleShape WindowModeDown(20.f, 3);
-    sf::RectangleShape Text800x600Button(Text800x600.getGlobalBounds().size);
-    sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
-    sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
-
-
-
-    WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
-    WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
-    WindowModeDown.rotate(sf::degrees(180));
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Sound bars and shapes
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    //SoundBar
-    SoundBar.setFillColor(sf::Color::Green);
-    SoundBar2.setFillColor(sf::Color::White);
-
-    //MusicBar
-    MusicBar.setFillColor(sf::Color::Green);
-    MusicBar2.setFillColor(sf::Color::White);
-
-    sf::CircleShape SoundCircle(10, 20); //SoundBar cursor
-    sf::CircleShape SoundCircle2(10, 20); //MusicBar cursor
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Sounds
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    sf::SoundBuffer buffer("Windows Background.wav");
-    sf::Sound sound(buffer);
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Music
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    //Music by <a href="https://pixabay.com/users/kimurasukuru-25042105/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=336601">kimurasukuru</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=336601">Pixabay</a>
-    sf::Music music("city-bgm-336601.mp3");
-    music.play();
-    music.setLooping(true);
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Angles
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    sf::Angle NorthAngle = sf::degrees(0);
-    sf::Angle EastAngle = sf::degrees(90);
-    sf::Angle SouthAngle = sf::degrees(180);
-    sf::Angle WestAngle = sf::degrees(270);
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Puzzle Pieces
-    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Initializing level class
+    Level ClassLevel;
     
-    //need to create a piece crafter class
-    // craft a puzzle piece: (shape, length of side, color)
-    PuzzlePiece piece(0, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
-    piece.setPosition({ 200, 400 });
-    piece.setRotation(NorthAngle);
-    piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
+    //Loading save file
+    if (filesystem::exists("savefile.txt")) {
+        ifstream inputSave("savefile.txt");
+        inputSave.open("savefile.txt");
+       
+        inputSave >> ClassLevel.Level;
+        inputSave >> ClassLevel.LevelClear; // Read the data
 
-    PuzzlePiece piece2(1, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
-    piece2.setPosition({ 350, 400 });
-    piece2.setRotation(NorthAngle);
-    piece2.setOrigin({ piece2.getGlobalBounds().size.x / 3.f, piece2.getGlobalBounds().size.y / 2.f });
+        inputSave.close();
+    }
+    else {
+        ClassLevel.Level = 0;
+        ClassLevel.LevelClear = false;
 
-    PuzzlePiece piece3(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 3 = minus
-    piece3.setPosition({ 500, 400 });
-    piece3.setRotation(NorthAngle);
-    //piece3.setOrigin({ piece3.getGlobalBounds().size.x / 2.f, piece3.getGlobalBounds().size.y / 2.f });
-
-    PuzzlePiece piece4(3, (Game.getSize().x / 20), sf::Color::Blue); // Shape 3 = minus
-    piece4.setPosition({ 650, 400 });
-    piece4.setRotation(NorthAngle);
-    //piece4.setOrigin({ piece4.getGlobalBounds().size.x / 2.f, piece4.getGlobalBounds().size.y / 2.f });
-
-    sf::RectangleShape Puzzle1Bounds(piece.getGlobalBounds().size);
-    sf::RectangleShape Puzzle2Bounds(piece2.getGlobalBounds().size);
-    sf::RectangleShape Puzzle3Bounds(piece3.getGlobalBounds().size);
-    sf::RectangleShape Puzzle4Bounds(piece4.getGlobalBounds().size);
-
-    // shape 0 = L
-    // shape 1 = T
-    // shape 2 = plus
-    // shape 3 = minus
-
-
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Windows types and screens
-    //------------------------------------------------------------------------------------------------------------------------------------------    
-    bool isMainMenu = true; // Screen = 0
-    bool isOptions = false; // Screen = 1
-    bool isPlay = false; // Screen = 2
-    bool isFullScreen = false;
-
-    int Screen = 0;
-
-    int ResolutionModes = 0;
-    //800x600:       ResolutionModes = 0
-    //1280x720:      ResolutionModes = 1
-    //1920x1080:     ResolutionModes = 2
-    //FullScreen:    ResolutionModes = 3
-
-    // Get the Previous screen value for the returnButton.
-    int PreviousScreen = Screen;
-
-    // Single Mouse click
-    bool click = true;
-
-    // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
-    bool HoldingPiece = false;
-    int HoldingPieceNum = 0;
-
-
-    // Run the program as long as the game window is open.
-    while (Game.isOpen()) {
-        
-        // Holding pieces.
-        HoldingPiece = false;
-        HoldingPieceNum = 0;
-
-        // Volumes of both sound and music. (also convert the float into int)
-        int Volume = (int)SoundBar.getSize().x / 3;
-        int MusicVolume = (int)MusicBar.getSize().x / 3;
-
-        // Finding the Game window size.
-        sf::Vector2u WindowSize = Game.getSize();
-        int WindowX = WindowSize.x;
-        int WindowY = WindowSize.y;
-
-        // Finding the center of the Game window.
-        float CenterX = WindowX / 2;
-        float CenterY = WindowY / 2;
-
-        // Get the local mouse position (relative to the Game window).
-        sf::Vector2i localPosition = sf::Mouse::getPosition(Game);
+        ofstream saveFile("savefile.txt", ios::out);
+        if (saveFile.is_open()) {
+            saveFile << ClassLevel.Level << endl;
+            saveFile << ClassLevel.LevelClear << endl;
+            saveFile.close();
+        }
+    }
 
         //------------------------------------------------------------------------------------------------------------------------------------------
-        // Press button only when it is the Main Menu.
-        //------------------------------------------------------------------------------------------------------------------------------------------ 
-        if (isMainMenu) {
-            Screen = 0;
+        // Writing the real code for the project here.
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        //Opens a window the size of (800, 600).
+        sf::RenderWindow Game(sf::VideoMode({ 800, 600 }), "Main Menu");
 
-            // PlayButton Changes to red when mouse hover.
-            if (PlayButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                PlayButton.setFillColor(sf::Color::Red);
 
-                // Left click to change window to Play window.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    isMainMenu = false;
-                    isOptions = false;
-                    isPlay = true;
-                    Game.create(sf::VideoMode(Game.getSize()), "Play");
-                    PreviousScreen = Screen;
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Backgrounds
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        Background bg;
+        bool renderFlag = true; // flag to check if the background needs to be redrawn
+
+        auto backgroundHelper = [&Game, &bg, &renderFlag]() { // lambda function to draw the background
+            sf::Texture current = bg.getBackground();
+            sf::Sprite bgSprite(current);
+            bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
+            Game.draw(bgSprite);
+            renderFlag = false;
+            };
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Fonts
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        sf::Font font("AGENCYR.ttf");
+        sf::Font font2("AGENCYB.ttf");
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Text Objects
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        sf::Text QuitText(font2);
+        QuitText.setString("Quit");
+
+        sf::Text VolumeText(font);
+
+        sf::Text TestSoundText(font);
+        TestSoundText.setString("TestSound");
+
+        sf::Text MusicVolumeText(font);
+
+        sf::Text PuzzleText(font);
+        PuzzleText.setString("Puzzle Piece");
+
+        sf::Text OptionsText(font);
+        OptionsText.setString("Options");
+
+        sf::Text PlayText(font);
+        PlayText.setString("Play");
+
+        sf::Text ReturnText(font);
+        ReturnText.setString("Return");
+
+        sf::Text MainMenuText(font);
+        MainMenuText.setString("Main Menu");
+
+        sf::Text ResolutionModeText(font);
+        ResolutionModeText.setString("Resolution Modes:");
+
+        sf::Text Text800x600(font);
+        Text800x600.setString("800x600");
+
+        sf::Text Text1280x720(font);
+        Text1280x720.setString("1280x720");
+
+        sf::Text Text1920x1080(font);
+        Text1920x1080.setString("1920x1080");
+
+        sf::Text FullScreenText(font);
+        FullScreenText.setString("Full Screen");
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Sprite Objects
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        //sf::Texture GrapeTexture("Grapes.png");
+        //sf::Sprite Grape(GrapeTexture);
+        //Grape.setColor(sf::Color::Blue);
+
+        // Sprite and texture.
+        sf::Texture SpeakerTexture("Speaker.png");
+        sf::Sprite Speaker(SpeakerTexture);
+        Speaker.setColor(sf::Color::White);
+        Speaker.setScale({ 0.25, 0.25 });
+
+        // Music Sprite and texture.
+        sf::Texture MusicTexture("TrebleClefBlack.png");
+        sf::Sprite MusicSymbol(MusicTexture);
+        MusicSymbol.setColor(sf::Color::White);
+        MusicSymbol.setScale({ 0.25, 0.25 });
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Buttons
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        sf::RectangleShape QuitButton(QuitText.getGlobalBounds().size); // Quit button
+        sf::RectangleShape FullScreenButton(FullScreenText.getGlobalBounds().size); //Fullscreen
+        sf::RectangleShape SoundBar({ 300, 20 }); //SoundBar is 300 pixel long.
+        sf::RectangleShape SoundBar2({ 300, 20 });
+        sf::RectangleShape TestSoundButton(TestSoundText.getGlobalBounds().size);
+        sf::RectangleShape MusicBar({ 300,20 });
+        sf::RectangleShape MusicBar2(MusicBar.getSize());
+        sf::RectangleShape OptionsButton(OptionsText.getGlobalBounds().size);
+        sf::RectangleShape PlayButton(PlayText.getGlobalBounds().size);
+        sf::RectangleShape ReturnButton(ReturnText.getGlobalBounds().size);
+        sf::RectangleShape MainMenuButton(MainMenuText.getGlobalBounds().size);
+        sf::RectangleShape ResolutionModeButton(ResolutionModeText.getGlobalBounds().size);
+        sf::CircleShape WindowModeUp(20.f, 3);
+        sf::CircleShape WindowModeDown(20.f, 3);
+        sf::RectangleShape Text800x600Button(Text800x600.getGlobalBounds().size);
+        sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
+        sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
+
+
+
+        WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
+        WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
+        WindowModeDown.rotate(sf::degrees(180));
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Sound bars and shapes
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        //SoundBar
+        SoundBar.setFillColor(sf::Color::Green);
+        SoundBar2.setFillColor(sf::Color::White);
+
+        //MusicBar
+        MusicBar.setFillColor(sf::Color::Green);
+        MusicBar2.setFillColor(sf::Color::White);
+
+        sf::CircleShape SoundCircle(10, 20); //SoundBar cursor
+        sf::CircleShape SoundCircle2(10, 20); //MusicBar cursor
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Sounds
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        sf::SoundBuffer buffer("Windows Background.wav");
+        sf::Sound sound(buffer);
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Music
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        //Music by <a href="https://pixabay.com/users/kimurasukuru-25042105/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=336601">kimurasukuru</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=336601">Pixabay</a>
+        sf::Music music("city-bgm-336601.mp3");
+        music.play();
+        music.setLooping(true);
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Angles
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        sf::Angle NorthAngle = sf::degrees(0);
+        sf::Angle EastAngle = sf::degrees(90);
+        sf::Angle SouthAngle = sf::degrees(180);
+        sf::Angle WestAngle = sf::degrees(270);
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Puzzle Pieces
+        //------------------------------------------------------------------------------------------------------------------------------------------
+
+        //need to create a piece crafter class
+        // craft a puzzle piece: (shape, length of side, color)
+        PuzzlePiece piece(0, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
+        piece.setPosition({ 200, 400 });
+        piece.setRotation(NorthAngle);
+        piece.setOrigin({ piece.getGlobalBounds().size.x / 3.f, piece.getGlobalBounds().size.y / 2.f });
+
+        PuzzlePiece piece2(1, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
+        piece2.setPosition({ 350, 400 });
+        piece2.setRotation(NorthAngle);
+        piece2.setOrigin({ piece2.getGlobalBounds().size.x / 3.f, piece2.getGlobalBounds().size.y / 2.f });
+
+        PuzzlePiece piece3(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 3 = minus
+        piece3.setPosition({ 500, 400 });
+        piece3.setRotation(NorthAngle);
+        //piece3.setOrigin({ piece3.getGlobalBounds().size.x / 2.f, piece3.getGlobalBounds().size.y / 2.f });
+
+        PuzzlePiece piece4(3, (Game.getSize().x / 20), sf::Color::Blue); // Shape 3 = minus
+        piece4.setPosition({ 650, 400 });
+        piece4.setRotation(NorthAngle);
+        //piece4.setOrigin({ piece4.getGlobalBounds().size.x / 2.f, piece4.getGlobalBounds().size.y / 2.f });
+
+        sf::RectangleShape Puzzle1Bounds(piece.getGlobalBounds().size);
+        sf::RectangleShape Puzzle2Bounds(piece2.getGlobalBounds().size);
+        sf::RectangleShape Puzzle3Bounds(piece3.getGlobalBounds().size);
+        sf::RectangleShape Puzzle4Bounds(piece4.getGlobalBounds().size);
+
+        // shape 0 = L
+        // shape 1 = T
+        // shape 2 = plus
+        // shape 3 = minus
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Windows types and screens
+        //------------------------------------------------------------------------------------------------------------------------------------------    
+        bool isMainMenu = true; // Screen = 0
+        bool isOptions = false; // Screen = 1
+        bool isPlay = false; // Screen = 2
+        bool isFullScreen = false;
+
+        int Screen = 0;
+
+        int ResolutionModes = 0;
+        //800x600:       ResolutionModes = 0
+        //1280x720:      ResolutionModes = 1
+        //1920x1080:     ResolutionModes = 2
+        //FullScreen:    ResolutionModes = 3
+
+        // Get the Previous screen value for the returnButton.
+        int PreviousScreen = Screen;
+
+        // Single Mouse click
+        bool click = true;
+
+        // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
+        bool HoldingPiece = false;
+        int HoldingPieceNum = 0;
+
+
+        // Run the program as long as the game window is open.
+        while (Game.isOpen()) {
+
+            // Holding pieces.
+            HoldingPiece = false;
+            HoldingPieceNum = 0;
+
+            // Volumes of both sound and music. (also convert the float into int)
+            int Volume = (int)SoundBar.getSize().x / 3;
+            int MusicVolume = (int)MusicBar.getSize().x / 3;
+
+            // Finding the Game window size.
+            sf::Vector2u WindowSize = Game.getSize();
+            int WindowX = WindowSize.x;
+            int WindowY = WindowSize.y;
+
+            // Finding the center of the Game window.
+            float CenterX = WindowX / 2;
+            float CenterY = WindowY / 2;
+
+            // Get the local mouse position (relative to the Game window).
+            sf::Vector2i localPosition = sf::Mouse::getPosition(Game);
+
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Press button only when it is the Main Menu.
+            //------------------------------------------------------------------------------------------------------------------------------------------ 
+            if (isMainMenu) {
+                Screen = 0;
+
+                // PlayButton Changes to red when mouse hover.
+                if (PlayButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    PlayButton.setFillColor(sf::Color::Red);
+
+                    // Left click to change window to Play window.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        isMainMenu = false;
+                        isOptions = false;
+                        isPlay = true;
+                        Game.create(sf::VideoMode(Game.getSize()), "Play");
+                        PreviousScreen = Screen;
+                    }
+                }
+                else {
+                    PlayButton.setFillColor(sf::Color::Blue);
+                }
+
+                // OptionsButton Changes to red when mouse hover.
+                if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    OptionsButton.setFillColor(sf::Color::Red);
+
+                    // Left click changes window to Options window.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        isMainMenu = false;
+                        isOptions = true;
+                        isPlay = false;
+                        Game.create(sf::VideoMode(Game.getSize()), "Options");
+                        PreviousScreen = Screen;
+                    }
+                }
+                else {
+                    OptionsButton.setFillColor(sf::Color::Blue);
+                }
+
+                // Quit Button Changes to red when mouse hover.
+                if (QuitButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    QuitButton.setFillColor(sf::Color::Red);
+
+                    // Left click to quit Game window.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                        // Add GameSave code here...
+
+                        Game.close();
+                    }
+                }
+                else {
+                    QuitButton.setFillColor(sf::Color::Blue);
                 }
             }
-            else {
-                PlayButton.setFillColor(sf::Color::Blue);
+
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Press button only when it is Play.
+            //------------------------------------------------------------------------------------------------------------------------------------------ 
+            if (isPlay) {
+                Screen = 2;
+
+                // Puzzle Changes to red when mouse hover.
+                if (!HoldingPiece || HoldingPieceNum == 1)
+                    if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                        piece.setFillColor(sf::Color::Red);
+
+                        // Left click and move to drag the puzzle piece.
+                        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                            HoldingPieceNum = 1;
+                            HoldingPiece = true;
+
+                            piece.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                            //Change the rotation of the Puzzle piece.
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                                piece.setRotation(WestAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                                piece.setRotation(NorthAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                                piece.setRotation(SouthAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                                piece.setRotation(EastAngle);
+                            }
+                        }
+                    }
+                    else {
+                        piece.setFillColor(sf::Color::Blue);
+                    }
+
+                if (!HoldingPiece || HoldingPieceNum == 2)
+                    if (piece2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                        piece2.setFillColor(sf::Color::Red);
+
+                        // Left click and move to drag the puzzle piece2.
+                        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                            HoldingPieceNum = 2;
+                            HoldingPiece = true;
+
+                            piece2.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                            //Change the rotation of the Puzzle piece2.
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                                piece2.setRotation(WestAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                                piece2.setRotation(NorthAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                                piece2.setRotation(SouthAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                                piece2.setRotation(EastAngle);
+                            }
+                        }
+                    }
+                    else {
+                        piece2.setFillColor(sf::Color::Blue);
+                    }
+
+                if (!HoldingPiece || HoldingPieceNum == 3)
+                    if (piece3.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                        piece3.setFillColor(sf::Color::Red);
+
+                        // Left click and move to drag the puzzle piece3.
+                        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                            HoldingPieceNum = 3;
+                            HoldingPiece = true;
+
+                            piece3.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                            //Change the rotation of the Puzzle piece3.
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                                piece3.setRotation(WestAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                                piece3.setRotation(NorthAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                                piece3.setRotation(SouthAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                                piece3.setRotation(EastAngle);
+                            }
+                        }
+                    }
+                    else {
+                        piece3.setFillColor(sf::Color::Blue);
+                    }
+
+                if (!HoldingPiece || HoldingPieceNum == 4)
+                    if (piece4.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                        piece4.setFillColor(sf::Color::Red);
+
+                        // Left click and move to drag the puzzle piece3.
+                        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                            HoldingPieceNum = 4;
+                            HoldingPiece = true;
+
+                            piece4.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                            //Change the rotation of the Puzzle piece4.
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                                piece4.setRotation(WestAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                                piece4.setRotation(NorthAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                                piece4.setRotation(SouthAngle);
+                            }
+
+                            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                                piece4.setRotation(EastAngle);
+                            }
+                        }
+                    }
+                    else {
+                        piece4.setFillColor(sf::Color::Blue);
+                    }
+
+                // OptionsButton Changes to red when mouse hover.
+                if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    OptionsButton.setFillColor(sf::Color::Red);
+
+                    // Left click changes window to Options window.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        isMainMenu = false;
+                        isOptions = true;
+                        isPlay = false;
+                        Game.create(sf::VideoMode(Game.getSize()), "Options");
+                        PreviousScreen = Screen;
+                    }
+                }
+                else {
+                    OptionsButton.setFillColor(sf::Color::Blue);
+                }
+
+                // ReturnButton Button Changes to red when mouse hover.
+                if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    ReturnButton.setFillColor(sf::Color::Red);
+
+                    // Left click to activate ReturnButton.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        if (PreviousScreen == 0) {
+                            Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
+                            isMainMenu = true;
+                            isOptions = false;
+                            isPlay = false;
+                            PreviousScreen = Screen;
+                        }
+
+                        if (PreviousScreen == 2) {
+                            Game.create(sf::VideoMode(Game.getSize()), "Play");
+                            isMainMenu = false;
+                            isOptions = false;
+                            isPlay = true;
+                            PreviousScreen = Screen;
+                        }
+                    }
+                }
+                else {
+                    ReturnButton.setFillColor(sf::Color::Blue);
+                }
+
+                // MainMenuButton Changes to red when mouse hover.
+                if (MainMenuButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    MainMenuButton.setFillColor(sf::Color::Red);
+
+                    // Left click to play test sound.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
+                        isMainMenu = true;
+                        isOptions = false;
+                        isPlay = false;
+                    }
+                }
+                else {
+                    MainMenuButton.setFillColor(sf::Color::Blue);
+                }
+
             }
 
-            // OptionsButton Changes to red when mouse hover.
-            if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                OptionsButton.setFillColor(sf::Color::Red);
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Press button only when it is the Options.
+            //------------------------------------------------------------------------------------------------------------------------------------------ 
+            if (isOptions) {
+                Screen = 1;
 
-                // Left click changes window to Options window.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    isMainMenu = false;
-                    isOptions = true;
-                    isPlay = false;
-                    Game.create(sf::VideoMode(Game.getSize()), "Options");
-                    PreviousScreen = Screen;
+                // Test800x600Button Changes to red when mouse hover.
+                if (Text800x600Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 0) {
+                    Text800x600Button.setFillColor(sf::Color::Red);
+
+                    // Left click to activate 800x600.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        Game.create(sf::VideoMode({ 800, 600 }), "Options", sf::State::Windowed);
+                        renderFlag = true; // set the flag to true to redraw the background to the correct size
+                    }
+                }
+                else {
+                    Text800x600Button.setFillColor(sf::Color::Blue);
+                }
+
+                // Text1280x720Button Changes to red when mouse hover.
+                if (Text1280x720Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 1) {
+                    Text1280x720Button.setFillColor(sf::Color::Red);
+
+                    // Left click to activate Text1280x720Button.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        Game.create(sf::VideoMode({ 1280, 720 }), "Options", sf::State::Windowed);
+                        renderFlag = true; // set the flag to true to redraw the background to the correct size
+
+                    }
+                }
+                else {
+                    Text1280x720Button.setFillColor(sf::Color::Blue);
+                }
+
+                // Text1920x1080Button Changes to red when mouse hover.
+                if (Text1920x1080Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 2) {
+                    Text1920x1080Button.setFillColor(sf::Color::Red);
+
+                    // Left click to activate Text1920x1080Button.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        Game.create(sf::VideoMode({ 1920, 1080 }), "Options", sf::State::Windowed);
+                        renderFlag = true; // set the flag to true to redraw the background to the correct size
+
+                    }
+                }
+                else {
+                    Text1920x1080Button.setFillColor(sf::Color::Blue);
+                }
+
+                // FullScreenButton Changes to red when mouse hover.
+                if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 3) {
+                    FullScreenButton.setFillColor(sf::Color::Red);
+
+                    // Left click to activate FullScreenMode.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        Game.create(sf::VideoMode::getFullscreenModes()[0], "Options", sf::Style::None, sf::State::Fullscreen);
+                        renderFlag = true; // set the flag to true to redraw the background to the correct size
+                    }
+                }
+                else {
+                    FullScreenButton.setFillColor(sf::Color::Blue);
+                }
+
+                //I have to use the SoundBar2 for the global bounds, since SoundBar changes.
+                if (SoundBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    SoundCircle.setPosition({ (float)localPosition.x - 10, SoundBar.getPosition().y });
+                    SoundCircle.setFillColor(sf::Color::White);
+                    Game.draw(SoundCircle);
+
+                    // Left click to adjust volume.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                        // Stop sound circle from going below the SoundBar position x.
+                        if (SoundCircle.getPosition().x < SoundBar.getPosition().x)
+                            SoundCircle.setPosition(SoundBar.getPosition());
+
+                        // Changes the SoundBar based on the position of the Mouse.
+                        SoundBar.setSize({ (localPosition.x - SoundBar.getPosition().x), SoundBar.getSize().y });
+
+                        // Set the volume of sound.
+                        sound.setVolume(Volume);
+                    }
+                }
+                else {
+                    SoundBar.setFillColor(sf::Color::Green);
+                    SoundCircle.setFillColor(sf::Color::Green);
+                }
+
+                // TestSound Button Changes to red when mouse hover.
+                if (TestSoundButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    TestSoundButton.setFillColor(sf::Color::Red);
+
+                    // Left click to play test sound.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        sound.play();
+                    }
+                }
+                else {
+                    TestSoundButton.setFillColor(sf::Color::Blue);
+                }
+
+                // MusicBar (Same thing as the SoundBar, but this one control the volume of the music).
+                if (MusicBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    SoundCircle2.setPosition({ (float)localPosition.x - 10, MusicBar2.getPosition().y });
+                    SoundCircle2.setFillColor(sf::Color::White);
+                    Game.draw(SoundCircle2);
+
+                    // Left click to adjust volume.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                        //Stop sound circle from going below the SoundBar position x.
+                        if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
+                            SoundCircle2.setPosition(MusicBar.getPosition());
+
+                        // Changes the MusicBar based on the position of the Mouse. 
+                        MusicBar.setSize({ (localPosition.x - MusicBar.getPosition().x), MusicBar.getSize().y });
+
+                        // Set the volume of music.
+                        music.setVolume(MusicVolume);
+                    }
+
+                }
+                else {
+                    MusicBar.setFillColor(sf::Color::Green);
+                    SoundCircle2.setFillColor(sf::Color::Green);
+                }
+
+                // ReturnButton Button Changes to red when mouse hover.
+                if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    ReturnButton.setFillColor(sf::Color::Red);
+
+                    // Left click to activate ReturnButton.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        if (PreviousScreen == 0) {
+                            Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
+                            isMainMenu = true;
+                            isOptions = false;
+                            isPlay = false;
+                            PreviousScreen = Screen;
+                        }
+
+                        if (PreviousScreen == 2) {
+                            Game.create(sf::VideoMode(Game.getSize()), "Play");
+                            isMainMenu = false;
+                            isOptions = false;
+                            isPlay = true;
+                            PreviousScreen = Screen;
+                        }
+                    }
+                }
+                else {
+                    ReturnButton.setFillColor(sf::Color::Blue);
+                }
+
+                // WindowModeButton is not a button.
+                if (ResolutionModeButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    //Empty
+                }
+                else {
+                    ResolutionModeButton.setFillColor(sf::Color::Blue);
+                }
+
+                // WindowModeUp Button Changes to red when mouse hover.
+                if (WindowModeUp.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    WindowModeUp.setFillColor(sf::Color::Red);
+
+                    // Left click to activate WindowModeUp.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && click) {
+                        ResolutionModes += 1;
+                        click = false;
+                    }
+
+                }
+                else {
+                    WindowModeUp.setFillColor(sf::Color::Blue);
+                }
+
+                // WindowModeDown Button Changes to red when mouse hover.
+                if (WindowModeDown.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                    WindowModeDown.setFillColor(sf::Color::Red);
+
+                    // Left click to activate WindowModeDown.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && click) {
+                        ResolutionModes -= 1;
+                        click = false;
+                    }
+
+                }
+                else {
+                    WindowModeDown.setFillColor(sf::Color::Blue);
                 }
             }
-            else {
-                OptionsButton.setFillColor(sf::Color::Blue);
-            }
 
-            // Quit Button Changes to red when mouse hover.
-            if (QuitButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                QuitButton.setFillColor(sf::Color::Red);
 
-                // Left click to quit Game window.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+            // Check all the window's events that were triggered since the last iteration of the loop.
+            while (const std::optional event = Game.pollEvent()) {
 
-                    // Add GameSave code here...
+                if (event->is < sf::Event::MouseButtonReleased>()) {
+                    click = true;
+                }
 
+                // "close requested" event: we close the window
+                if (event->is<sf::Event::Closed>()) {
+
+                    ofstream saveFile("savefile.txt", ios::out);
+                    if (saveFile.is_open()) {
+                        saveFile << ClassLevel.Level << endl;
+                        saveFile << ClassLevel.LevelClear << endl;
+                        saveFile.close();
+
+                    }
                     Game.close();
                 }
             }
-            else {
-                QuitButton.setFillColor(sf::Color::Blue);
-            }
-        }
 
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        // Press button only when it is Play.
-        //------------------------------------------------------------------------------------------------------------------------------------------ 
-        if (isPlay) {
-            Screen = 2;
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Positions of Main menu objects.
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            PlayButton.setPosition({ OptionsButton.getPosition().x, OptionsButton.getPosition().y - 50 });
+            PlayText.setPosition(PlayButton.getPosition());
 
-            // Puzzle Changes to red when mouse hover.
-            if(!HoldingPiece || HoldingPieceNum == 1)
-                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                    piece.setFillColor(sf::Color::Red);
-
-                    // Left click and move to drag the puzzle piece.
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    
-                        HoldingPieceNum = 1;
-                        HoldingPiece = true;
-
-                        piece.setPosition({ (float)localPosition.x , (float)localPosition.y });
-
-                        //Change the rotation of the Puzzle piece.
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                            piece.setRotation(WestAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                            piece.setRotation(NorthAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                            piece.setRotation(SouthAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                            piece.setRotation(EastAngle);
-                        }
-                    }
-                }
-                else {
-                    piece.setFillColor(sf::Color::Blue);
-                }
-
-            if (!HoldingPiece || HoldingPieceNum == 2)
-                if (piece2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                    piece2.setFillColor(sf::Color::Red);
-
-                    // Left click and move to drag the puzzle piece2.
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                        HoldingPieceNum = 2;
-                        HoldingPiece = true;
-
-                        piece2.setPosition({ (float)localPosition.x , (float)localPosition.y });
-
-                        //Change the rotation of the Puzzle piece2.
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                            piece2.setRotation(WestAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                            piece2.setRotation(NorthAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                            piece2.setRotation(SouthAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                            piece2.setRotation(EastAngle);
-                        }
-                    }
-                }
-                else {
-                    piece2.setFillColor(sf::Color::Blue);
-                }
-
-            if (!HoldingPiece || HoldingPieceNum == 3)
-                if (piece3.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                    piece3.setFillColor(sf::Color::Red);
-
-                    // Left click and move to drag the puzzle piece3.
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                        HoldingPieceNum = 3;
-                        HoldingPiece = true;
-                        
-                        piece3.setPosition({ (float)localPosition.x , (float)localPosition.y });
-
-                        //Change the rotation of the Puzzle piece3.
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                            piece3.setRotation(WestAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                            piece3.setRotation(NorthAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                            piece3.setRotation(SouthAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                            piece3.setRotation(EastAngle);
-                        }
-                    }
-                }
-                else {
-                    piece3.setFillColor(sf::Color::Blue);
-                }
-
-            if (!HoldingPiece || HoldingPieceNum == 4)
-                if (piece4.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                    piece4.setFillColor(sf::Color::Red);
-
-                    // Left click and move to drag the puzzle piece3.
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                        HoldingPieceNum = 4;
-                        HoldingPiece = true;
-
-                        piece4.setPosition({ (float)localPosition.x , (float)localPosition.y });
-
-                        //Change the rotation of the Puzzle piece4.
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                            piece4.setRotation(WestAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                            piece4.setRotation(NorthAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                            piece4.setRotation(SouthAngle);
-                        }
-
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                            piece4.setRotation(EastAngle);
-                        }
-                    }
-                }
-                else {
-                    piece4.setFillColor(sf::Color::Blue);
-                }
-
-            // OptionsButton Changes to red when mouse hover.
-            if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                OptionsButton.setFillColor(sf::Color::Red);
-
-                // Left click changes window to Options window.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    isMainMenu = false;
-                    isOptions = true;
-                    isPlay = false;
-                    Game.create(sf::VideoMode(Game.getSize()), "Options");
-                    PreviousScreen = Screen;
-                }
-            }
-            else {
-                OptionsButton.setFillColor(sf::Color::Blue);
-            }
-
-            // ReturnButton Button Changes to red when mouse hover.
-            if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                ReturnButton.setFillColor(sf::Color::Red);
-
-                // Left click to activate ReturnButton.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    if (PreviousScreen == 0) {
-                        Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
-                        isMainMenu = true;
-                        isOptions = false;
-                        isPlay = false;
-                        PreviousScreen = Screen;
-                    }
-
-                    if (PreviousScreen == 2) {
-                        Game.create(sf::VideoMode(Game.getSize()), "Play");
-                        isMainMenu = false;
-                        isOptions = false;
-                        isPlay = true;
-                        PreviousScreen = Screen;
-                    }
-                }
-            }
-            else {
-                ReturnButton.setFillColor(sf::Color::Blue);
-            }
-
-            // MainMenuButton Changes to red when mouse hover.
-            if (MainMenuButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                MainMenuButton.setFillColor(sf::Color::Red);
-
-                // Left click to play test sound.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
-                    isMainMenu = true;
-                    isOptions = false;
-                    isPlay = false;
-                }
-            }
-            else {
-                MainMenuButton.setFillColor(sf::Color::Blue);
-            }
-
-        }
-
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        // Press button only when it is the Options.
-        //------------------------------------------------------------------------------------------------------------------------------------------ 
-        if (isOptions) {
-            Screen = 1;
-
-            // Test800x600Button Changes to red when mouse hover.
-            if (Text800x600Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 0) {
-                Text800x600Button.setFillColor(sf::Color::Red);
-
-                // Left click to activate 800x600.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    Game.create(sf::VideoMode({ 800, 600 }), "Options", sf::State::Windowed);
-					renderFlag = true; // set the flag to true to redraw the background to the correct size
-                }
-            }
-            else {
-                Text800x600Button.setFillColor(sf::Color::Blue);
-            }
-
-            // Text1280x720Button Changes to red when mouse hover.
-            if (Text1280x720Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 1) {
-                Text1280x720Button.setFillColor(sf::Color::Red);
-
-                // Left click to activate Text1280x720Button.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    Game.create(sf::VideoMode({ 1280, 720 }), "Options", sf::State::Windowed);
-                    renderFlag = true; // set the flag to true to redraw the background to the correct size
-
-                }
-            }
-            else {
-                Text1280x720Button.setFillColor(sf::Color::Blue);
-            }
-
-            // Text1920x1080Button Changes to red when mouse hover.
-            if (Text1920x1080Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 2) {
-                Text1920x1080Button.setFillColor(sf::Color::Red);
-
-                // Left click to activate Text1920x1080Button.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    Game.create(sf::VideoMode({ 1920, 1080 }), "Options", sf::State::Windowed);
-                    renderFlag = true; // set the flag to true to redraw the background to the correct size
-
-                }
-            }
-            else {
-                Text1920x1080Button.setFillColor(sf::Color::Blue);
-            }
-
-            // FullScreenButton Changes to red when mouse hover.
-            if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 3) {
-                FullScreenButton.setFillColor(sf::Color::Red);
-
-                // Left click to activate FullScreenMode.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    Game.create(sf::VideoMode::getFullscreenModes()[0], "Options", sf::Style::None, sf::State::Fullscreen);
-                    renderFlag = true; // set the flag to true to redraw the background to the correct size
-                }
-            }
-            else {
-                FullScreenButton.setFillColor(sf::Color::Blue);
-            }
-
-            //I have to use the SoundBar2 for the global bounds, since SoundBar changes.
-            if (SoundBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                SoundCircle.setPosition({ (float)localPosition.x - 10, SoundBar.getPosition().y });
-                SoundCircle.setFillColor(sf::Color::White);
-                Game.draw(SoundCircle);
-
-                // Left click to adjust volume.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                    // Stop sound circle from going below the SoundBar position x.
-                    if (SoundCircle.getPosition().x < SoundBar.getPosition().x)
-                        SoundCircle.setPosition(SoundBar.getPosition());
-
-                    // Changes the SoundBar based on the position of the Mouse.
-                    SoundBar.setSize({ (localPosition.x - SoundBar.getPosition().x), SoundBar.getSize().y });
-
-                    // Set the volume of sound.
-                    sound.setVolume(Volume);
-                }
-            }
-            else {
-                SoundBar.setFillColor(sf::Color::Green);
-                SoundCircle.setFillColor(sf::Color::Green);
-            }
-
-            // TestSound Button Changes to red when mouse hover.
-            if (TestSoundButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                TestSoundButton.setFillColor(sf::Color::Red);
-
-                // Left click to play test sound.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    sound.play();
-                }
-            }
-            else {
-                TestSoundButton.setFillColor(sf::Color::Blue);
-            }
-
-            // MusicBar (Same thing as the SoundBar, but this one control the volume of the music).
-            if (MusicBar2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                SoundCircle2.setPosition({ (float)localPosition.x - 10, MusicBar2.getPosition().y });
-                SoundCircle2.setFillColor(sf::Color::White);
-                Game.draw(SoundCircle2);
-
-                // Left click to adjust volume.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                    //Stop sound circle from going below the SoundBar position x.
-                    if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
-                        SoundCircle2.setPosition(MusicBar.getPosition());
-
-                    // Changes the MusicBar based on the position of the Mouse. 
-                    MusicBar.setSize({ (localPosition.x - MusicBar.getPosition().x), MusicBar.getSize().y });
-
-                    // Set the volume of music.
-                    music.setVolume(MusicVolume);
-                }
-
-            }
-            else {
-                MusicBar.setFillColor(sf::Color::Green);
-                SoundCircle2.setFillColor(sf::Color::Green);
-            }
-
-            // ReturnButton Button Changes to red when mouse hover.
-            if (ReturnButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                ReturnButton.setFillColor(sf::Color::Red);
-
-                // Left click to activate ReturnButton.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    if (PreviousScreen == 0) {
-                        Game.create(sf::VideoMode(Game.getSize()), "Main Menu");
-                        isMainMenu = true;
-                        isOptions = false;
-                        isPlay = false;
-                        PreviousScreen = Screen;
-                    }
-
-                    if (PreviousScreen == 2) {
-                        Game.create(sf::VideoMode(Game.getSize()), "Play");
-                        isMainMenu = false;
-                        isOptions = false;
-                        isPlay = true;
-                        PreviousScreen = Screen;
-                    }
-                }
-            }
-            else {
-                ReturnButton.setFillColor(sf::Color::Blue);
-            }
-
-            // WindowModeButton is not a button.
-            if (ResolutionModeButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                //Empty
-            }
-            else {
-                ResolutionModeButton.setFillColor(sf::Color::Blue);
-            }
-
-            // WindowModeUp Button Changes to red when mouse hover.
-            if (WindowModeUp.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                WindowModeUp.setFillColor(sf::Color::Red);
-
-                // Left click to activate WindowModeUp.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && click) {
-                    ResolutionModes += 1;
-                    click = false;
-                }
-
-            }
-            else {
-                WindowModeUp.setFillColor(sf::Color::Blue);
-            }
-
-            // WindowModeDown Button Changes to red when mouse hover.
-            if (WindowModeDown.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                WindowModeDown.setFillColor(sf::Color::Red);
-
-                // Left click to activate WindowModeDown.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && click) {
-                    ResolutionModes -= 1;
-                    click = false;
-                }
-
-            }
-            else {
-                WindowModeDown.setFillColor(sf::Color::Blue);
-            }
-        }
-
-
-        // Check all the window's events that were triggered since the last iteration of the loop.
-        while (const std::optional event = Game.pollEvent()) {
-
-            if (event->is < sf::Event::MouseButtonReleased>()) {
-                click = true;
-            }
-
-            // "close requested" event: we close the window
-            if (event->is<sf::Event::Closed>()) {
-
-                // Add GameSave code here...
-
-                Game.close();
-            }
-        }
-
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        // Positions of Main menu objects.
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        PlayButton.setPosition({ OptionsButton.getPosition().x, OptionsButton.getPosition().y - 50 });
-        PlayText.setPosition(PlayButton.getPosition());
-
-        OptionsButton.setPosition({ QuitButton.getPosition().x, QuitButton.getPosition().y - 50 });
-        OptionsText.setPosition(OptionsButton.getPosition());
-
-        QuitButton.setPosition({ CenterX, CenterY });
-        QuitText.setPosition({ CenterX, CenterY });
-
-
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        // Positions of Play objects.
-        //------------------------------------------------------------------------------------------------------------------------------------------ 
-        // Position of puzzle pieces
-        PuzzleText.setPosition(piece.getPosition());
-        PuzzleText.setRotation(piece.getRotation());
-        PuzzleText.setOrigin(piece.getOrigin());
-
-        MainMenuText.setPosition({ 0, 0 });
-        MainMenuButton.setPosition(MainMenuText.getPosition());
-
-        Puzzle1Bounds.setPosition(piece.getPosition());
-        Puzzle2Bounds.setPosition(piece2.getPosition());
-        Puzzle3Bounds.setPosition(piece3.getPosition());
-        Puzzle4Bounds.setPosition(piece4.getPosition());
-
-        Puzzle1Bounds.setRotation(piece.getRotation());
-        Puzzle2Bounds.setRotation(piece2.getRotation());
-        Puzzle3Bounds.setRotation(piece3.getRotation());
-        Puzzle4Bounds.setRotation(piece4.getRotation());
-
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        // Positions of Options objects.
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        // Transform change the position of Object2 relative to Object1
-        sf::Transform transform = Speaker.getTransform();
-        sf::Transform transform2 = MusicSymbol.getTransform();
-        sf::Transform transform3 = ResolutionModeButton.getTransform();
-
-        // Relative position of the objects. From Object1 to Object2.
-        sf::Vector2f relativePosition(300, 90);
-        sf::Vector2f relativePosition2(200, 0);
-
-        // Apply the transformation to the relative position.
-        sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
-        sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
-        sf::Vector2f transformedPosition3 = transform3.transformPoint(relativePosition2);
-
-        // Move Object2 relative to Object1.
-        SoundBar2.setPosition(transformedPosition);
-        SoundBar.setPosition(transformedPosition);
-        MusicBar.setPosition(transformedPosition2);
-        MusicBar2.setPosition(transformedPosition2);
-        Text800x600.setPosition(transformedPosition3);
-        Text800x600Button.setPosition(transformedPosition3);
-        Text1280x720.setPosition(transformedPosition3);
-        Text1280x720Button.setPosition(transformedPosition3);
-        Text1920x1080.setPosition(transformedPosition3);
-        Text1920x1080Button.setPosition(transformedPosition3);
-        FullScreenText.setPosition(transformedPosition3);
-        FullScreenButton.setPosition(transformedPosition3);
-
-
-
-        // Positions of SoundBar and Volume
-        VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
-        Speaker.setPosition({ CenterX - 200, CenterY });
-
-        // Positions of MusicBar and Volume
-        MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
-        MusicSymbol.setPosition({ Speaker.getPosition().x, Speaker.getPosition().y - 100 });
-
-        //Convert Volume and MusicVolume into string.
-        string VolumeString = to_string(Volume);
-        VolumeText.setString(VolumeString);
-
-        string MusicVolumeString = to_string(MusicVolume);
-        MusicVolumeText.setString(MusicVolumeString);
-
-        // Positions of the TestSound is left at default (top left).
-
-        ResolutionModeText.setPosition({ MusicSymbol.getPosition().x, MusicSymbol.getPosition().y - 100 });
-        ResolutionModeButton.setPosition(ResolutionModeText.getPosition());
-
-        WindowModeUp.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y });
-        WindowModeDown.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y + 40 });
-
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        // Other windows that share buttons.
-        //------------------------------------------------------------------------------------------------------------------------------------------
-
-        if (isOptions) {
-            ReturnText.setPosition({ CenterX, CenterY + 100 });
-            ReturnButton.setPosition(ReturnText.getPosition());
-        }
-
-        if (isPlay) {
-            ReturnText.setPosition({ 0,0 });
-            ReturnButton.setPosition(ReturnText.getPosition());
-
-            OptionsText.setPosition({ 0, 50 });
-            OptionsButton.setPosition(OptionsText.getPosition());
-        }
-
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        // Drawing/Displaying the objects onto the Game Window.
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        PlayButton.setPosition({ OptionsButton.getPosition().x, OptionsButton.getPosition().y - 50 });
-        PlayText.setPosition(PlayButton.getPosition());
-
-        if (isMainMenu) {
             OptionsButton.setPosition({ QuitButton.getPosition().x, QuitButton.getPosition().y - 50 });
             OptionsText.setPosition(OptionsButton.getPosition());
-        }
 
-        QuitButton.setPosition({ CenterX, CenterY });
-        QuitText.setPosition({ CenterX, CenterY });
-
-        //PreviousText.setString(to_string(PreviousScreen));
-        //PreviousText.setPosition({ 300, 300 });
-
-        //Order matters when drawing objects.
-        Game.clear();
+            QuitButton.setPosition({ CenterX, CenterY });
+            QuitText.setPosition({ CenterX, CenterY });
 
 
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Positions of Play objects.
+            //------------------------------------------------------------------------------------------------------------------------------------------ 
+            // Position of puzzle pieces
+            PuzzleText.setPosition(piece.getPosition());
+            PuzzleText.setRotation(piece.getRotation());
+            PuzzleText.setOrigin(piece.getOrigin());
+
+            MainMenuText.setPosition({ 0, 0 });
+            MainMenuButton.setPosition(MainMenuText.getPosition());
+
+            Puzzle1Bounds.setPosition(piece.getPosition());
+            Puzzle2Bounds.setPosition(piece2.getPosition());
+            Puzzle3Bounds.setPosition(piece3.getPosition());
+            Puzzle4Bounds.setPosition(piece4.getPosition());
+
+            Puzzle1Bounds.setRotation(piece.getRotation());
+            Puzzle2Bounds.setRotation(piece2.getRotation());
+            Puzzle3Bounds.setRotation(piece3.getRotation());
+            Puzzle4Bounds.setRotation(piece4.getRotation());
+
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Positions of Options objects.
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Transform change the position of Object2 relative to Object1
+            sf::Transform transform = Speaker.getTransform();
+            sf::Transform transform2 = MusicSymbol.getTransform();
+            sf::Transform transform3 = ResolutionModeButton.getTransform();
+
+            // Relative position of the objects. From Object1 to Object2.
+            sf::Vector2f relativePosition(300, 90);
+            sf::Vector2f relativePosition2(200, 0);
+
+            // Apply the transformation to the relative position.
+            sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
+            sf::Vector2f transformedPosition2 = transform2.transformPoint(relativePosition);
+            sf::Vector2f transformedPosition3 = transform3.transformPoint(relativePosition2);
+
+            // Move Object2 relative to Object1.
+            SoundBar2.setPosition(transformedPosition);
+            SoundBar.setPosition(transformedPosition);
+            MusicBar.setPosition(transformedPosition2);
+            MusicBar2.setPosition(transformedPosition2);
+            Text800x600.setPosition(transformedPosition3);
+            Text800x600Button.setPosition(transformedPosition3);
+            Text1280x720.setPosition(transformedPosition3);
+            Text1280x720Button.setPosition(transformedPosition3);
+            Text1920x1080.setPosition(transformedPosition3);
+            Text1920x1080Button.setPosition(transformedPosition3);
+            FullScreenText.setPosition(transformedPosition3);
+            FullScreenButton.setPosition(transformedPosition3);
 
 
-        if (isMainMenu) {
-            backgroundHelper();
-            Game.draw(QuitButton);
-            Game.draw(QuitText);
-            Game.draw(OptionsButton);
-            Game.draw(OptionsText);
-            Game.draw(PlayButton);
-            Game.draw(PlayText);
-            //Game.draw(Grape);
-        }
 
-        if (isOptions) {
-			backgroundHelper();
-            Game.draw(Speaker);
-            Game.draw(SoundBar2);
-            Game.draw(SoundBar);
-            Game.draw(VolumeText);
-            Game.draw(SoundCircle);
-            Game.draw(TestSoundButton);
-            Game.draw(TestSoundText);
-            Game.draw(MusicSymbol);
-            Game.draw(MusicBar2);
-            Game.draw(MusicBar);
-            Game.draw(MusicVolumeText);
-            Game.draw(SoundCircle2);
-            Game.draw(ReturnButton);
-            Game.draw(ReturnText);
-            Game.draw(ResolutionModeButton);
-            Game.draw(ResolutionModeText);
-            Game.draw(WindowModeUp);
-            Game.draw(WindowModeDown);
+            // Positions of SoundBar and Volume
+            VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
+            Speaker.setPosition({ CenterX - 200, CenterY });
 
-            if (ResolutionModes % 4 == 0) {
-                Game.draw(Text800x600Button);
-                Game.draw(Text800x600);
+            // Positions of MusicBar and Volume
+            MusicVolumeText.setPosition({ MusicBar.getPosition().x, MusicBar.getPosition().y - 50 });
+            MusicSymbol.setPosition({ Speaker.getPosition().x, Speaker.getPosition().y - 100 });
+
+            //Convert Volume and MusicVolume into string.
+            string VolumeString = to_string(Volume);
+            VolumeText.setString(VolumeString);
+
+            string MusicVolumeString = to_string(MusicVolume);
+            MusicVolumeText.setString(MusicVolumeString);
+
+            // Positions of the TestSound is left at default (top left).
+
+            ResolutionModeText.setPosition({ MusicSymbol.getPosition().x, MusicSymbol.getPosition().y - 100 });
+            ResolutionModeButton.setPosition(ResolutionModeText.getPosition());
+
+            WindowModeUp.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y });
+            WindowModeDown.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y + 40 });
+
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Other windows that share buttons.
+            //------------------------------------------------------------------------------------------------------------------------------------------
+
+            if (isOptions) {
+                ReturnText.setPosition({ CenterX, CenterY + 100 });
+                ReturnButton.setPosition(ReturnText.getPosition());
             }
 
-            if (ResolutionModes % 4 == 1) {
-                Game.draw(Text1280x720Button);
-                Game.draw(Text1280x720);
+            if (isPlay) {
+                ReturnText.setPosition({ 0,0 });
+                ReturnButton.setPosition(ReturnText.getPosition());
+
+                OptionsText.setPosition({ 0, 50 });
+                OptionsButton.setPosition(OptionsText.getPosition());
             }
 
-            if (ResolutionModes % 4 == 2) {
-                Game.draw(Text1920x1080Button);
-                Game.draw(Text1920x1080);
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            // Drawing/Displaying the objects onto the Game Window.
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            PlayButton.setPosition({ OptionsButton.getPosition().x, OptionsButton.getPosition().y - 50 });
+            PlayText.setPosition(PlayButton.getPosition());
+
+            if (isMainMenu) {
+                OptionsButton.setPosition({ QuitButton.getPosition().x, QuitButton.getPosition().y - 50 });
+                OptionsText.setPosition(OptionsButton.getPosition());
             }
 
-            if (ResolutionModes % 4 == 3) {
-                Game.draw(FullScreenButton);
-                Game.draw(FullScreenText);
+            QuitButton.setPosition({ CenterX, CenterY });
+            QuitText.setPosition({ CenterX, CenterY });
+
+            //PreviousText.setString(to_string(PreviousScreen));
+            //PreviousText.setPosition({ 300, 300 });
+
+            //Order matters when drawing objects.
+            Game.clear();
+
+
+
+
+            if (isMainMenu) {
+                backgroundHelper();
+                Game.draw(QuitButton);
+                Game.draw(QuitText);
+                Game.draw(OptionsButton);
+                Game.draw(OptionsText);
+                Game.draw(PlayButton);
+                Game.draw(PlayText);
+                //Game.draw(Grape);
             }
+
+            if (isOptions) {
+                backgroundHelper();
+                Game.draw(Speaker);
+                Game.draw(SoundBar2);
+                Game.draw(SoundBar);
+                Game.draw(VolumeText);
+                Game.draw(SoundCircle);
+                Game.draw(TestSoundButton);
+                Game.draw(TestSoundText);
+                Game.draw(MusicSymbol);
+                Game.draw(MusicBar2);
+                Game.draw(MusicBar);
+                Game.draw(MusicVolumeText);
+                Game.draw(SoundCircle2);
+                Game.draw(ReturnButton);
+                Game.draw(ReturnText);
+                Game.draw(ResolutionModeButton);
+                Game.draw(ResolutionModeText);
+                Game.draw(WindowModeUp);
+                Game.draw(WindowModeDown);
+
+                if (ResolutionModes % 4 == 0) {
+                    Game.draw(Text800x600Button);
+                    Game.draw(Text800x600);
+                }
+
+                if (ResolutionModes % 4 == 1) {
+                    Game.draw(Text1280x720Button);
+                    Game.draw(Text1280x720);
+                }
+
+                if (ResolutionModes % 4 == 2) {
+                    Game.draw(Text1920x1080Button);
+                    Game.draw(Text1920x1080);
+                }
+
+                if (ResolutionModes % 4 == 3) {
+                    Game.draw(FullScreenButton);
+                    Game.draw(FullScreenText);
+                }
+            }
+
+            if (isPlay) {
+                backgroundHelper();
+                Game.draw(Puzzle1Bounds);
+                Game.draw(Puzzle2Bounds);
+                Game.draw(Puzzle3Bounds);
+                Game.draw(Puzzle4Bounds);
+                Game.draw(piece);
+                Game.draw(piece2);
+                Game.draw(piece3);
+                Game.draw(piece4);
+                Game.draw(PuzzleText);
+                Game.draw(OptionsButton);
+                Game.draw(OptionsText);
+                Game.draw(MainMenuButton);
+                Game.draw(MainMenuText);
+            }
+            Game.display();
         }
-
-        if (isPlay) {
-            backgroundHelper();
-            Game.draw(Puzzle1Bounds);
-            Game.draw(Puzzle2Bounds);
-            Game.draw(Puzzle3Bounds);
-            Game.draw(Puzzle4Bounds);
-            Game.draw(piece);
-            Game.draw(piece2);
-            Game.draw(piece3);
-            Game.draw(piece4);
-            Game.draw(PuzzleText);
-            Game.draw(OptionsButton);
-            Game.draw(OptionsText);
-            Game.draw(MainMenuButton);
-            Game.draw(MainMenuText);
-        }
-        Game.display();
     }
-}
 
 
 
