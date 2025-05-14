@@ -523,38 +523,82 @@ int main() {
         if (isPlay) {
             Screen = 2;
 
-            bool holdingPiece = false;
+            static bool holdingPiece = false;
+            static int heldPieceIndex = -1;
 
-            // Puzzle Changes to red when mouse hover.
-            for (auto& piece : pieces) {
-                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && !holdingPiece) {
+            // Reverse iterate to prioritize topmost pieces
+            for (int i = static_cast<int>(pieces.size()) - 1; i >= 0; --i) {
+                PuzzlePiece& piece = pieces[i];
+
+                if (!holdingPiece && piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
                     piece.setFillColor(sf::Color::Red);
 
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        // Pick up the piece
                         holdingPiece = true;
-                        piece.setPosition({ (float)localPosition.x, (float)localPosition.y });
+                        heldPieceIndex = i;
 
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                            piece.setRotation(WestAngle);
-                        }
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                            piece.setRotation(NorthAngle);
-                        }
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                            piece.setRotation(SouthAngle);
-                        }
-                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                            piece.setRotation(EastAngle);
-                        }
-                    }
-                    else {
-                        holdingPiece = false;
+                        // Move it to the back so it draws last
+                        PuzzlePiece held = piece;
+                        pieces.erase(pieces.begin() + i);
+                        pieces.push_back(held);
+                        heldPieceIndex = static_cast<int>(pieces.size()) - 1;
+                        break; // stop after picking one
                     }
                 }
                 else {
                     piece.setFillColor(sf::Color::Blue);
                 }
             }
+
+            // If holding a piece, follow the mouse and rotate
+            if (holdingPiece && heldPieceIndex >= 0 && heldPieceIndex < pieces.size()) {
+                PuzzlePiece& heldPiece = pieces[heldPieceIndex];
+                heldPiece.setPosition({ (float)localPosition.x, (float)localPosition.y });
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                    heldPiece.setRotation(WestAngle);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                    heldPiece.setRotation(NorthAngle);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                    heldPiece.setRotation(SouthAngle);
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                    heldPiece.setRotation(EastAngle);
+                }
+
+                // Optional: release on mouse release
+                if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    holdingPiece = false;
+                    heldPieceIndex = -1;
+                }
+
+            }
+
+            // Loop that iterates the puzzle pieces, and change color to Magenta if a collison occurs.
+            // Note: This only checks for a piece next in line of the iterations.
+            // P[3] checks for P[2] checks for P[1] checks for P[0]
+            // What this means that if a collision occurs with P[3] and P[0]
+            // They will not change color, but it will work eventually.
+            for (int i = static_cast<int>(pieces.size()) - 1; i >= 1; --i) {
+                PuzzlePiece& piece = pieces[i];
+                if (pieces[i].getGlobalBounds().findIntersection(pieces[i-1].getGlobalBounds())) {
+                    pieces[i].setFillColor(sf::Color::Magenta);
+                    pieces[i-1].setFillColor(sf::Color::Magenta);
+                }
+                   
+            }
+            for (int i = 1; i < static_cast<int>(pieces.size()); ++i) {
+                PuzzlePiece& piece1 = pieces[i - 1];
+                PuzzlePiece& piece2 = pieces[i];
+            }
+
+
+                        // calculate if intersection between piece1 and piece2
+                        // if true, piece1.setFillColor(sf::Color Color(...));
+                        // piece2.setFillColor(...);
 
 
             // OptionsButton Changes to red when mouse hover.
@@ -1028,9 +1072,10 @@ int main() {
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
 
-            //if (SolutionBox.getGlobalBounds().findIntersection(piece.getGlobalBounds()) && SolutionBox.getSize() == piece.getBlockSize())
-            Game.draw(LevelClearText);
 
+            //if(SolutionBox.getGlobalBounds().findIntersection())
+            Game.draw(LevelClearText);
+            
         }
         Game.display();
     }
