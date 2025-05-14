@@ -1,9 +1,41 @@
 ﻿  JigsawPuzzleGame.cpp
-D:\School\Spring 2025\Spring 2025 Software Engineering (CPSC-4360-01)\JigsawPuzzleGame\External\SFML\include\SFML\System\Exception.hpp(41,47): warning C4275: non dll-interface class 'std::runtime_error' used as base for dll-interface class 'sf::Exception'
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\External\SFML\include\SFML\System\Exception.hpp(41,47): warning C4275: non dll-interface class 'std::runtime_error' used as base for dll-interface class 'sf::Exception'
   (compiling source file 'JigsawPuzzleGame.cpp')
       C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\stdexcept(100,19):
       see declaration of 'std::runtime_error'
-      D:\School\Spring 2025\Spring 2025 Software Engineering (CPSC-4360-01)\JigsawPuzzleGame\External\SFML\include\SFML\System\Exception.hpp(41,23):
+      C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\External\SFML\include\SFML\System\Exception.hpp(41,23):
       see declaration of 'sf::Exception'
   
-  JigsawPuzzleGame.vcxproj -> D:\School\Spring 2025\Spring 2025 Software Engineering (CPSC-4360-01)\JigsawPuzzleGame\Debug\JigsawPuzzleGame.exe
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(118,35): warning C4834: discarding return value of function with [[nodiscard]] attribute
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(119,35): warning C4834: discarding return value of function with [[nodiscard]] attribute
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(120,35): warning C4834: discarding return value of function with [[nodiscard]] attribute
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(121,35): warning C4834: discarding return value of function with [[nodiscard]] attribute
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(235,35): error C2065: 'QuitText': undeclared identifier
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(239,40): error C2065: 'TestSoundText': undeclared identifier
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(408,23): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(409,23): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(605,48): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(605,48): warning C4244:         with
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(605,48): warning C4244:         [
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(605,48): warning C4244:             T=unsigned int
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(605,48): warning C4244:         ]
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(611,49): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(611,49): warning C4244:         with
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(611,49): warning C4244:         [
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(611,49): warning C4244:             T=unsigned int
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(611,49): warning C4244:         ]
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(616,49): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(616,49): warning C4244:         with
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(616,49): warning C4244:         [
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(616,49): warning C4244:             T=unsigned int
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(616,49): warning C4244:         ]
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(621,49): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(621,49): warning C4244:         with
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(621,49): warning C4244:         [
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(621,49): warning C4244:             T=unsigned int
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(621,49): warning C4244:         ]
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(681,27): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(682,27): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(1036,41): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(1085,41): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Adam Mai\source\repos\TheAmazingGraper\Coding-Projects\JigsawPuzzleGame\JigsawPuzzleGame.cpp(397,27): error C1075: '{': no matching token found
