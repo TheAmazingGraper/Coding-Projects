@@ -179,7 +179,8 @@ int main() {
         auto backgroundHelper = [&Game, &bg, &renderFlag]() { // lambda function to draw the background
             sf::Texture current = bg.getBackground();
             sf::Sprite bgSprite(current);
-            bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
+            bgSprite.setScale({ 30,30 });
+            //bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
             Game.draw(bgSprite);
             renderFlag = false;
             };
@@ -235,6 +236,9 @@ int main() {
         sf::Text FullScreenText(font);
         FullScreenText.setString("Full Screen");
 
+        sf::Text LevelClearText(font);
+        LevelClearText.setString("Level Clear!");
+
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Sprite Objects
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -275,8 +279,8 @@ int main() {
         sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
         sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
-
-
+        sf::RectangleShape SolutionBox({ 30,30 });
+        sf::FloatRect Checker;
         WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
         WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
         WindowModeDown.rotate(sf::degrees(180));
@@ -456,7 +460,13 @@ int main() {
                     // Left click to quit Game window.
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
 
-                        // Add GameSave code here...
+                        ofstream saveFile("savefile.txt", ios::out);
+                        if (saveFile.is_open()) {
+                            saveFile << ClassLevel.Level << endl;
+                            saveFile << ClassLevel.LevelClear << endl;
+                            saveFile.close();
+
+                        }
 
                         Game.close();
                     }
@@ -784,6 +794,7 @@ int main() {
 
                         //Stop sound circle from going below the SoundBar position x.
                         if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
+                        if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
                             SoundCircle2.setPosition(MusicBar.getPosition());
 
                         // Changes the MusicBar based on the position of the Mouse. 
@@ -920,6 +931,9 @@ int main() {
             Puzzle2Bounds.setRotation(piece2.getRotation());
             Puzzle3Bounds.setRotation(piece3.getRotation());
             Puzzle4Bounds.setRotation(piece4.getRotation());
+
+            SolutionBox.setPosition({ CenterX, CenterY });
+            LevelClearText.setPosition({ CenterX,CenterY - 200 });
 
             //------------------------------------------------------------------------------------------------------------------------------------------
             // Positions of Options objects.
@@ -1072,6 +1086,7 @@ int main() {
 
             if (isPlay) {
                 backgroundHelper();
+                Game.draw(SolutionBox);
                 Game.draw(Puzzle1Bounds);
                 Game.draw(Puzzle2Bounds);
                 Game.draw(Puzzle3Bounds);
@@ -1085,6 +1100,10 @@ int main() {
                 Game.draw(OptionsText);
                 Game.draw(MainMenuButton);
                 Game.draw(MainMenuText);
+                
+                //if (SolutionBox.getGlobalBounds().findIntersection(piece.getGlobalBounds()) && SolutionBox.getSize() == piece.getBlockSize())
+                    Game.draw(LevelClearText);
+
             }
             Game.display();
         }
