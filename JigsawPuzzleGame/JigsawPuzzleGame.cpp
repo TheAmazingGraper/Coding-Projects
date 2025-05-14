@@ -242,6 +242,7 @@ int main() {
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
 
+
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
     WindowModeDown.rotate(sf::degrees(180));
@@ -294,19 +295,29 @@ int main() {
     //need to create a piece crafter class
     // craft a puzzle piece: (shape, length of side, color)
     PuzzlePiece piece(0, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
-    piece.setPosition({ 300, 400 });
+    piece.setPosition({ 200, 400 });
     piece.setRotation(NorthAngle);
     piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
 
-    PuzzlePiece piece2(0, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
-    piece2.setPosition({ 400, 400 });
+    PuzzlePiece piece2(1, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
+    piece2.setPosition({ 350, 400 });
     piece2.setRotation(NorthAngle);
     piece2.setOrigin({ piece2.getGlobalBounds().size.x / 3.f, piece2.getGlobalBounds().size.y / 2.f });
 
-    PuzzlePiece piece3(3, (Game.getSize().x / 20), sf::Color::Blue); // Shape 3 = minus
+    PuzzlePiece piece3(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 3 = minus
     piece3.setPosition({ 500, 400 });
     piece3.setRotation(NorthAngle);
     //piece3.setOrigin({ piece3.getGlobalBounds().size.x / 2.f, piece3.getGlobalBounds().size.y / 2.f });
+
+    PuzzlePiece piece4(3, (Game.getSize().x / 20), sf::Color::Blue); // Shape 3 = minus
+    piece4.setPosition({ 650, 400 });
+    piece4.setRotation(NorthAngle);
+    //piece4.setOrigin({ piece4.getGlobalBounds().size.x / 2.f, piece4.getGlobalBounds().size.y / 2.f });
+
+    sf::RectangleShape Puzzle1Bounds(piece.getGlobalBounds().size);
+    sf::RectangleShape Puzzle2Bounds(piece2.getGlobalBounds().size);
+    sf::RectangleShape Puzzle3Bounds(piece3.getGlobalBounds().size);
+    sf::RectangleShape Puzzle4Bounds(piece4.getGlobalBounds().size);
 
     // shape 0 = L
     // shape 1 = T
@@ -339,13 +350,14 @@ int main() {
     // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
     bool HoldingPiece = false;
     int HoldingPieceNum = 0;
-    sf::Text HoldText(font);
-    HoldText.setPosition({ 400,400 });
-    sf::Text HoldingPieceText(font);
-    HoldingPieceText.setPosition({ 300,300 });
+
 
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
+        
+        // Holding pieces.
+        HoldingPiece = false;
+        HoldingPieceNum = 0;
 
         // Volumes of both sound and music. (also convert the float into int)
         int Volume = (int)SoundBar.getSize().x / 3;
@@ -529,16 +541,39 @@ int main() {
                     piece3.setFillColor(sf::Color::Blue);
                 }
 
-            // Holding pieces.
-            HoldingPiece = false;
-            HoldingPieceNum = 0;
+            if (!HoldingPiece || HoldingPieceNum == 4)
+                if (piece4.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                    piece4.setFillColor(sf::Color::Red);
 
-            if (HoldingPiece) {
-                HoldingPieceText.setString("True");
-            }
-            else {
-                HoldingPieceText.setString("False");
-            }
+                    // Left click and move to drag the puzzle piece3.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                        HoldingPieceNum = 4;
+                        HoldingPiece = true;
+
+                        piece4.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                        //Change the rotation of the Puzzle piece4.
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                            piece4.setRotation(WestAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                            piece4.setRotation(NorthAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                            piece4.setRotation(SouthAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                            piece4.setRotation(EastAngle);
+                        }
+                    }
+                }
+                else {
+                    piece4.setFillColor(sf::Color::Blue);
+                }
 
             // OptionsButton Changes to red when mouse hover.
             if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
@@ -599,7 +634,7 @@ int main() {
             else {
                 MainMenuButton.setFillColor(sf::Color::Blue);
             }
-            HoldText.setString(to_string(HoldingPieceNum));
+
         }
 
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -837,6 +872,11 @@ int main() {
         MainMenuText.setPosition({ 0, 0 });
         MainMenuButton.setPosition(MainMenuText.getPosition());
 
+        Puzzle1Bounds.setPosition(piece.getPosition());
+        Puzzle2Bounds.setPosition(piece2.getPosition());
+        Puzzle3Bounds.setPosition(piece3.getPosition());
+        Puzzle4Bounds.setPosition(piece4.getPosition());
+
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -988,17 +1028,19 @@ int main() {
 
         if (isPlay) {
             backgroundHelper();
+            Game.draw(Puzzle1Bounds);
+            Game.draw(Puzzle2Bounds);
+            Game.draw(Puzzle3Bounds);
+            Game.draw(Puzzle4Bounds);
             Game.draw(piece);
             Game.draw(piece2);
             Game.draw(piece3);
+            Game.draw(piece4);
             Game.draw(PuzzleText);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
-            Game.draw(HoldText);
-            Game.draw(HoldingPieceText);
-
         }
         Game.display();
     }
