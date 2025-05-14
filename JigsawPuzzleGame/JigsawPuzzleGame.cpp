@@ -298,10 +298,15 @@ int main() {
     piece.setRotation(NorthAngle);
     piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
 
-    PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
+    PuzzlePiece piece2(1, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = T
     piece2.setPosition({ 400, 400 });
     piece2.setRotation(NorthAngle);
-    piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
+    piece2.setOrigin({ piece2.getGlobalBounds().size.x / 3.f, piece2.getGlobalBounds().size.y / 2.f });
+
+    PuzzlePiece piece3(3, (Game.getSize().x / 20), sf::Color::Blue); // Shape 3 = minus
+    piece3.setPosition({ 500, 400 });
+    piece3.setRotation(NorthAngle);
+    //piece3.setOrigin({ piece3.getGlobalBounds().size.x / 2.f, piece3.getGlobalBounds().size.y / 2.f });
 
     // shape 0 = L
     // shape 1 = T
@@ -331,8 +336,22 @@ int main() {
     // Single Mouse click
     bool click = true;
 
+    // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
+    bool HoldingPiece = false;
+    int HoldingPieceNum = 0;
+    sf::Text HoldText(font);
+    HoldText.setPosition({ 400,400 });
+    sf::Text HoldingPieceText(font);
+    HoldingPieceText.setPosition({ 300,300 });
+
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
+
+        // Holding pieces.
+        HoldingPiece = false;
+        HoldingPieceNum = 0;
+
+
         // Volumes of both sound and music. (also convert the float into int)
         int Volume = (int)SoundBar.getSize().x / 3;
         int MusicVolume = (int)MusicBar.getSize().x / 3;
@@ -413,64 +432,113 @@ int main() {
             Screen = 2;
 
             // Puzzle Changes to red when mouse hover.
-            if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                piece.setFillColor(sf::Color::Red);
+            if(!HoldingPiece || HoldingPieceNum == 1)
+                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                    piece.setFillColor(sf::Color::Red);
 
-                // Left click and move to drag the puzzle piece.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    // Left click and move to drag the puzzle piece.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    
+                        HoldingPieceNum = 1;
+                        HoldingPiece = true;
 
-                    piece.setPosition({ (float)localPosition.x , (float)localPosition.y });
+                        piece.setPosition({ (float)localPosition.x , (float)localPosition.y });
 
-                    //Change the rotation of the Puzzle piece.
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                        piece.setRotation(WestAngle);
-                    }
+                        //Change the rotation of the Puzzle piece.
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                            piece.setRotation(WestAngle);
+                        }
 
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                        piece.setRotation(NorthAngle);
-                    }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                            piece.setRotation(NorthAngle);
+                        }
 
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                        piece.setRotation(SouthAngle);
-                    }
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                            piece.setRotation(SouthAngle);
+                        }
 
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                        piece.setRotation(EastAngle);
-                    }
-                }
-            }
-            else {
-                piece.setFillColor(sf::Color::Blue);
-            }
-
-            if (piece2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
-                piece2.setFillColor(sf::Color::Red);
-
-                // Left click and move to drag the puzzle piece2.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-
-                    piece2.setPosition({ (float)localPosition.x , (float)localPosition.y });
-
-                    //Change the rotation of the Puzzle piece2.
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-                        piece2.setRotation(WestAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-                        piece2.setRotation(NorthAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-                        piece2.setRotation(SouthAngle);
-                    }
-
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-                        piece2.setRotation(EastAngle);
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                            piece.setRotation(EastAngle);
+                        }
                     }
                 }
+                else {
+                    piece.setFillColor(sf::Color::Blue);
+                }
+
+            if (!HoldingPiece || HoldingPieceNum == 2)
+                if (piece2.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                    piece2.setFillColor(sf::Color::Red);
+
+                    // Left click and move to drag the puzzle piece2.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                        HoldingPieceNum = 2;
+                        HoldingPiece = true;
+
+                        piece2.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                        //Change the rotation of the Puzzle piece2.
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                            piece2.setRotation(WestAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                            piece2.setRotation(NorthAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                            piece2.setRotation(SouthAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                            piece2.setRotation(EastAngle);
+                        }
+                    }
+                }
+                else {
+                    piece2.setFillColor(sf::Color::Blue);
+                }
+
+            if (!HoldingPiece || HoldingPieceNum == 3)
+                if (piece3.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && isPlay) {
+                    piece3.setFillColor(sf::Color::Red);
+
+                    // Left click and move to drag the puzzle piece3.
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+
+                        HoldingPieceNum = 3;
+                        HoldingPiece = true;
+                        
+                        piece3.setPosition({ (float)localPosition.x , (float)localPosition.y });
+
+                        //Change the rotation of the Puzzle piece3.
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+                            piece3.setRotation(WestAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+                            piece3.setRotation(NorthAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+                            piece3.setRotation(SouthAngle);
+                        }
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+                            piece3.setRotation(EastAngle);
+                        }
+                    }
+                }
+                else {
+                    piece3.setFillColor(sf::Color::Blue);
+                }
+
+            if (HoldingPiece) {
+                HoldingPieceText.setString("True");
             }
             else {
-                piece2.setFillColor(sf::Color::Blue);
+                HoldingPieceText.setString("False");
             }
 
             // OptionsButton Changes to red when mouse hover.
@@ -532,7 +600,7 @@ int main() {
             else {
                 MainMenuButton.setFillColor(sf::Color::Blue);
             }
-
+            HoldText.setString(to_string(HoldingPieceNum));
         }
 
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -921,13 +989,40 @@ int main() {
 
         if (isPlay) {
             backgroundHelper();
-            Game.draw(piece);
-            Game.draw(piece2);
-            Game.draw(PuzzleText);
+            //Game.draw(piece);
+            //Game.draw(piece2);
+            //Game.draw(piece3);
+            //Game.draw(PuzzleText);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
+            Game.draw(HoldText);
+            Game.draw(HoldingPieceText);
+
+            if (HoldingPiece) {
+                if (HoldingPieceNum == 1) {
+                    Game.draw(piece3);
+                    Game.draw(piece2);
+                    Game.draw(piece);
+                }
+                if (HoldingPieceNum == 2) {
+                    Game.draw(piece3);
+                    Game.draw(piece);
+                    Game.draw(piece2);
+                }
+                if (HoldingPieceNum == 3) {
+                    Game.draw(piece);
+                    Game.draw(piece2);
+                    Game.draw(piece3);
+                }
+            }
+            else {
+                Game.draw(piece);
+                Game.draw(piece2);
+                Game.draw(piece3);
+            }
+
         }
         Game.display();
     }
