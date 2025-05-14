@@ -1,6 +1,6 @@
 // Jigsaw Puzzle.cpp : This file contains the 'main' function. Program execution begins and ends there.
 // Due Date May 14.
-
+//Added a single comment.
 using namespace std;
 
 #pragma once
@@ -13,6 +13,8 @@ using namespace std;
 #include <limits>
 #include <algorithm>
 #include <random>
+#include <fstream>
+#include <string>
 
 
 class PuzzlePiece : public sf::Drawable, public sf::Transformable {
@@ -26,7 +28,7 @@ public:
 
     PuzzlePiece(int num, float blockSize, sf::Color color = sf::Color::Blue)
         : blockSize(blockSize), color(color), shape(getShape(num)) {
-       
+
         // build shape
         for (const auto& coord : *shape) {
             sf::RectangleShape block(sf::Vector2f(blockSize, blockSize)); // building block (small sqaure)
@@ -52,10 +54,10 @@ public:
         float minX = std::numeric_limits<float>::max();
         float minY = std::numeric_limits<float>::max();
         float maxX = std::numeric_limits<float>::lowest();
-        float maxY = std::numeric_limits<float>::lowest(); 
+        float maxY = std::numeric_limits<float>::lowest();
 
         for (const auto& block : blocks) {
-            sf::Transform totalTransform = getTransform() * block.getTransform(); 
+            sf::Transform totalTransform = getTransform() * block.getTransform();
             sf::FloatRect rect = totalTransform.transformRect(block.getLocalBounds());
 
             minX = std::min<float>(minX, rect.position.x);
@@ -78,7 +80,7 @@ private:
     const std::vector<sf::Vector2i>* shape; // |
 
     // method to choose puzzle piece
-    static const std::vector<sf::Vector2i>* getShape(int num) { 
+    static const std::vector<sf::Vector2i>* getShape(int num) {
         switch (num) {
         case 0: return &L;
         case 1: return &T;
@@ -102,7 +104,7 @@ const std::vector<sf::Vector2i> PuzzlePiece::T = { {0,0}, {1,0}, {2,0}, {1,1} };
 const std::vector<sf::Vector2i> PuzzlePiece::plus = { {0,1}, {1,0}, {1,1}, {2,1}, {1,2} }; // shape 2
 const std::vector<sf::Vector2i> PuzzlePiece::minus = { {0,0}, {1,0} }; // shape 3
 
-class Background : public sf::Texture{
+class Background : public sf::Texture {
 
 
     sf::Texture bgTextures[4];
@@ -119,16 +121,47 @@ public:
     }
 
     void setBackground(int num) {
-		currentTexture = bgTextures[num];
+        currentTexture = bgTextures[num];
     }
 
     sf::Texture getBackground() {
-       return currentTexture;
+        return currentTexture;
     }
+};
+
+class Level {
+public:
+    int Level;
+    bool LevelClear;
+
 };
 
 
 int main() {
+    // Initializing level class
+    Level ClassLevel;
+
+    //Loading save file
+    if (filesystem::exists("savefile.txt")) {
+        ifstream inputSave("savefile.txt");
+        inputSave.open("savefile.txt");
+
+        inputSave >> ClassLevel.Level;
+        inputSave >> ClassLevel.LevelClear; // Read the data
+
+        inputSave.close();
+    }
+    else {
+        ClassLevel.Level = 0;
+        ClassLevel.LevelClear = false;
+
+        ofstream saveFile("savefile.txt", ios::out);
+        if (saveFile.is_open()) {
+            saveFile << ClassLevel.Level << endl;
+            saveFile << ClassLevel.LevelClear << endl;
+            saveFile.close();
+        }
+    }
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Writing the real code for the project here.
@@ -141,17 +174,18 @@ int main() {
     // Backgrounds
     //------------------------------------------------------------------------------------------------------------------------------------------
     Background bg;
+    bool renderFlag = true; // flag to check if the background needs to be redrawn
 
-    auto drawBackground = [&Game, &bg](bool renderFlag) { // lambda function to draw the background
+    auto backgroundHelper = [&Game, &bg, &renderFlag]() { // lambda function to draw the background
         sf::Texture current = bg.getBackground();
         sf::Sprite bgSprite(current);
 
-        if (renderFlag) {
+        if (renderFlag);
             bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
-        }
-
-            Game.draw(bgSprite);
         
+
+        Game.draw(bgSprite);
+        renderFlag = false;
         };
 
 
@@ -205,6 +239,9 @@ int main() {
     sf::Text FullScreenText(font);
     FullScreenText.setString("Full Screen");
 
+    sf::Text LevelClearText(font);
+    LevelClearText.setString("Level Clear!");
+
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -245,7 +282,8 @@ int main() {
     sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
-
+    sf::RectangleShape SolutionBox({ 30,30 });
+    sf::FloatRect Checker;
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
     WindowModeDown.rotate(sf::degrees(180));
@@ -294,26 +332,26 @@ int main() {
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Puzzle Pieces
     //------------------------------------------------------------------------------------------------------------------------------------------
-    
+
     //need to create a piece crafter class
-    // craft a puzzle piece: (shape, length of side, color)
-    //PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
-    //piece.setPosition({ 300, 400 });
-    //piece.setRotation(NorthAngle);
-    //piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
+// craft a puzzle piece: (shape, length of side, color)
+//PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
+//piece.setPosition({ 300, 400 });
+//piece.setRotation(NorthAngle);
+//piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
 
-    //PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
-    //piece2.setPosition({ 400, 400 });
-    //piece2.setRotation(NorthAngle);
-    //piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
+//PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
+//piece2.setPosition({ 400, 400 });
+//piece2.setRotation(NorthAngle);
+//piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
 
-    // shape 0 = L
-    // shape 1 = T
-    // shape 2 = plus
-    // shape 3 = minus
-    
+// shape 0 = L
+// shape 1 = T
+// shape 2 = plus
+// shape 3 = minus
+
     std::vector<PuzzlePiece> pieces;
-    
+
     std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> xDist(100, 200);
     std::uniform_int_distribution<int> yDist(100, Game.getSize().y);
@@ -344,7 +382,7 @@ int main() {
                 piece.setOrigin({ bounds.size.x / 2.6667f, bounds.size.y / 2.6667f });
                 break;
             case 3: // minus-shape
-                piece.setOrigin({ bounds.size.x / 4.f, bounds.size.y / 8.f});
+                piece.setOrigin({ bounds.size.x / 4.f, bounds.size.y / 8.f });
                 break;
             }
 
@@ -363,7 +401,7 @@ int main() {
         }
         };
 
-    pieceMaker({ 0, 1, 2, 3, 0, 1, 2, 3 });
+    pieceMaker({ 0, 1, 2, 3 });
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -388,8 +426,18 @@ int main() {
     // Single Mouse click
     bool click = true;
 
+    // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
+    //bool HoldingPiece = false;
+    //int HoldingPieceNum = 0;
+
+
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
+
+        // Holding pieces.
+        //HoldingPiece = false;
+        //HoldingPieceNum = 0;
+
         // Volumes of both sound and music. (also convert the float into int)
         int Volume = (int)SoundBar.getSize().x / 3;
         int MusicVolume = (int)MusicBar.getSize().x / 3;
@@ -453,7 +501,13 @@ int main() {
                 // Left click to quit Game window.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
 
-                    // Add GameSave code here...
+                    ofstream saveFile("savefile.txt", ios::out);
+                    if (saveFile.is_open()) {
+                        saveFile << ClassLevel.Level << endl;
+                        saveFile << ClassLevel.LevelClear << endl;
+                        saveFile.close();
+
+                    }
 
                     Game.close();
                 }
@@ -469,12 +523,15 @@ int main() {
         if (isPlay) {
             Screen = 2;
 
+            bool holdingPiece = false;
+
             // Puzzle Changes to red when mouse hover.
             for (auto& piece : pieces) {
-                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && isPlay) {
+                if (piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) && isPlay && !holdingPiece) {
                     piece.setFillColor(sf::Color::Red);
 
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                        holdingPiece = true;
                         piece.setPosition({ (float)localPosition.x, (float)localPosition.y });
 
                         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
@@ -490,11 +547,15 @@ int main() {
                             piece.setRotation(EastAngle);
                         }
                     }
+                    else {
+                        holdingPiece = false;
+                    }
                 }
                 else {
                     piece.setFillColor(sf::Color::Blue);
                 }
             }
+
 
             // OptionsButton Changes to red when mouse hover.
             if (OptionsButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
@@ -571,7 +632,7 @@ int main() {
                 // Left click to activate 800x600.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 800, 600 }), "Options", sf::State::Windowed);
-                    drawBackground(true); // draw and resize background
+                    renderFlag = true; // set the flag to true to redraw the background to the correct size
                 }
             }
             else {
@@ -585,7 +646,7 @@ int main() {
                 // Left click to activate Text1280x720Button.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 1280, 720 }), "Options", sf::State::Windowed);
-                    drawBackground(true); // draw and resize background
+                    renderFlag = true; // set the flag to true to redraw the background to the correct size
 
                 }
             }
@@ -600,7 +661,7 @@ int main() {
                 // Left click to activate Text1920x1080Button.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 1920, 1080 }), "Options", sf::State::Windowed);
-                    drawBackground(true); // draw and resize background
+                    renderFlag = true; // set the flag to true to redraw the background to the correct size
 
                 }
             }
@@ -615,7 +676,7 @@ int main() {
                 // Left click to activate FullScreenMode.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode::getFullscreenModes()[0], "Options", sf::Style::None, sf::State::Fullscreen);
-                    drawBackground(true); // draw and resize background
+                    renderFlag = true; // set the flag to true to redraw the background to the correct size
                 }
             }
             else {
@@ -671,7 +732,8 @@ int main() {
 
                     //Stop sound circle from going below the SoundBar position x.
                     if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
-                        SoundCircle2.setPosition(MusicBar.getPosition());
+                        if (SoundCircle2.getPosition().x < MusicBar.getPosition().x)
+                            SoundCircle2.setPosition(MusicBar.getPosition());
 
                     // Changes the MusicBar based on the position of the Mouse. 
                     MusicBar.setSize({ (localPosition.x - MusicBar.getPosition().x), MusicBar.getSize().y });
@@ -763,8 +825,13 @@ int main() {
             // "close requested" event: we close the window
             if (event->is<sf::Event::Closed>()) {
 
-                // Add GameSave code here...
+                ofstream saveFile("savefile.txt", ios::out);
+                if (saveFile.is_open()) {
+                    saveFile << ClassLevel.Level << endl;
+                    saveFile << ClassLevel.LevelClear << endl;
+                    saveFile.close();
 
+                }
                 Game.close();
             }
         }
@@ -785,13 +852,23 @@ int main() {
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Play objects.
         //------------------------------------------------------------------------------------------------------------------------------------------ 
-        // Position of puzzle pieces
-        //PuzzleText.setPosition(piece.getPosition());
-        //PuzzleText.setRotation(piece.getRotation());
-        //PuzzleText.setOrigin(piece.getOrigin());
+
 
         MainMenuText.setPosition({ 0, 0 });
         MainMenuButton.setPosition(MainMenuText.getPosition());
+
+        // Puzzle1Bounds.setPosition(piece.getPosition());
+        // Puzzle2Bounds.setPosition(piece2.getPosition());
+        // Puzzle3Bounds.setPosition(piece3.getPosition());
+        // Puzzle4Bounds.setPosition(piece4.getPosition());
+
+        // Puzzle1Bounds.setRotation(piece.getRotation());
+        // Puzzle2Bounds.setRotation(piece2.getRotation());
+        // Puzzle3Bounds.setRotation(piece3.getRotation());
+        // Puzzle4Bounds.setRotation(piece4.getRotation());
+
+        SolutionBox.setPosition({ CenterX, CenterY });
+        LevelClearText.setPosition({ CenterX,CenterY - 200 });
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -890,7 +967,7 @@ int main() {
 
 
         if (isMainMenu) {
-            drawBackground(false); // just draw background; do not resize
+            backgroundHelper();
             Game.draw(QuitButton);
             Game.draw(QuitText);
             Game.draw(OptionsButton);
@@ -901,7 +978,7 @@ int main() {
         }
 
         if (isOptions) {
-            drawBackground(false); // just draw background; do not resize
+            backgroundHelper();
             Game.draw(Speaker);
             Game.draw(SoundBar2);
             Game.draw(SoundBar);
@@ -943,12 +1020,17 @@ int main() {
         }
 
         if (isPlay) {
-            drawBackground(false); // just draw background; do not resize
+            backgroundHelper();
             drawPieces();
+            Game.draw(SolutionBox);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
+
+            //if (SolutionBox.getGlobalBounds().findIntersection(piece.getGlobalBounds()) && SolutionBox.getSize() == piece.getBlockSize())
+            Game.draw(LevelClearText);
+
         }
         Game.display();
     }
