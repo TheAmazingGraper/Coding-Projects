@@ -101,6 +101,31 @@ const std::vector<sf::Vector2i> PuzzlePiece::T = { {0,0}, {1,0}, {2,0}, {1,1} };
 const std::vector<sf::Vector2i> PuzzlePiece::plus = { {0,1}, {1,0}, {1,1}, {2,1}, {1,2} }; // shape 2
 const std::vector<sf::Vector2i> PuzzlePiece::minus = { {0,0}, {1,0} }; // shape 3
 
+class Background : public sf::Texture{
+
+
+    sf::Texture bgTextures[4];
+    sf::Texture currentTexture;
+
+public:
+    Background() {
+        bgTextures[0].loadFromFile("background1.png");
+        bgTextures[1].loadFromFile("background2.png");
+        bgTextures[2].loadFromFile("background3.png");
+        bgTextures[3].loadFromFile("background4.png");
+
+        setBackground(0); // default
+    }
+
+    void setBackground(int num) {
+		currentTexture = bgTextures[num];
+    }
+
+    sf::Texture getBackground() {
+       return currentTexture;
+    }
+};
+
 
 int main() {
 
@@ -109,6 +134,21 @@ int main() {
     //------------------------------------------------------------------------------------------------------------------------------------------
     //Opens a window the size of (800, 600).
     sf::RenderWindow Game(sf::VideoMode({ 800, 600 }), "Main Menu");
+
+
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Backgrounds
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    Background bg;
+	bool renderFlag = true; // flag to check if the background needs to be redrawn
+
+    auto backgroundHelper = [&Game, &bg, &renderFlag]() { // lambda function to draw the background
+        sf::Texture current = bg.getBackground();
+        sf::Sprite bgSprite(current);
+        bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
+        Game.draw(bgSprite);
+        renderFlag = false;
+    };
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -467,6 +507,7 @@ int main() {
                 // Left click to activate 800x600.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 800, 600 }), "Options", sf::State::Windowed);
+					renderFlag = true; // set the flag to true to redraw the background to the correct size
                 }
             }
             else {
@@ -480,6 +521,8 @@ int main() {
                 // Left click to activate Text1280x720Button.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 1280, 720 }), "Options", sf::State::Windowed);
+                    renderFlag = true; // set the flag to true to redraw the background to the correct size
+
                 }
             }
             else {
@@ -493,6 +536,8 @@ int main() {
                 // Left click to activate Text1920x1080Button.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode({ 1920, 1080 }), "Options", sf::State::Windowed);
+                    renderFlag = true; // set the flag to true to redraw the background to the correct size
+
                 }
             }
             else {
@@ -506,6 +551,7 @@ int main() {
                 // Left click to activate FullScreenMode.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     Game.create(sf::VideoMode::getFullscreenModes()[0], "Options", sf::Style::None, sf::State::Fullscreen);
+                    renderFlag = true; // set the flag to true to redraw the background to the correct size
                 }
             }
             else {
@@ -780,6 +826,7 @@ int main() {
 
 
         if (isMainMenu) {
+            backgroundHelper();
             Game.draw(QuitButton);
             Game.draw(QuitText);
             Game.draw(OptionsButton);
@@ -790,6 +837,7 @@ int main() {
         }
 
         if (isOptions) {
+			backgroundHelper();
             Game.draw(Speaker);
             Game.draw(SoundBar2);
             Game.draw(SoundBar);
@@ -831,6 +879,7 @@ int main() {
         }
 
         if (isPlay) {
+            backgroundHelper();
             Game.draw(piece);
             Game.draw(PuzzleText);
             Game.draw(OptionsButton);
