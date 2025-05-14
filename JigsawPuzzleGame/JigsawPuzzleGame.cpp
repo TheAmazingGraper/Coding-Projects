@@ -168,8 +168,6 @@ int main(){
     bool isFullScreen = false;
 
     int Screen = 0;
-    
-   
 
     int ResolutionModes = 0;
     //800x600:       ResolutionModes = 0
@@ -180,7 +178,8 @@ int main(){
     // Get the Previous screen value for the returnButton.
     int PreviousScreen = Screen;
 
-    sf::Text PreviousText(font);
+    // Single Mouse click
+    bool click = true;
 
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
@@ -518,9 +517,11 @@ int main(){
                 WindowModeUp.setFillColor(sf::Color::Red);
 
                 // Left click to activate WindowModeUp.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && click) {
                     ResolutionModes += 1;
+                    click = false;
                 }
+                
             }
             else {
                 WindowModeUp.setFillColor(sf::Color::Blue);
@@ -531,9 +532,11 @@ int main(){
                 WindowModeDown.setFillColor(sf::Color::Red);
 
                 // Left click to activate WindowModeDown.
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && click) {
                     ResolutionModes -= 1;
+                    click = false;
                 }
+                
             }
             else {
                 WindowModeDown.setFillColor(sf::Color::Blue);
@@ -543,6 +546,11 @@ int main(){
 
         // Check all the window's events that were triggered since the last iteration of the loop.
         while (const std::optional event = Game.pollEvent()) {
+
+            if (event->is < sf::Event::MouseButtonReleased>()) {
+                click = true;
+            }
+
             // "close requested" event: we close the window
             if (event->is<sf::Event::Closed>()) {
 
