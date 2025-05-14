@@ -29,9 +29,6 @@ int main(){
     sf::Text QuitText(font2);
     QuitText.setString("Quit");
 
-    sf::Text FullScreenText(font);
-    FullScreenText.setString("Full Screen");
-
     sf::Text VolumeText(font); 
 
     sf::Text TestSoundText(font);
@@ -54,11 +51,20 @@ int main(){
     sf::Text MainMenuText(font);
     MainMenuText.setString("Main Menu");
 
-    sf::Text WindowModeText(font);
-    WindowModeText.setString("Window Mode:");
-    
-    sf::Text WindowText(font);
-    WindowText.setString("Window");
+    sf::Text ResolutionModeText(font);
+    ResolutionModeText.setString("Resolution Modes:");
+
+    sf::Text Text800x600(font);
+    Text800x600.setString("800x600");
+
+    sf::Text Text1280x720(font);
+    Text1280x720.setString("1280x720");
+
+    sf::Text Text1920x1080(font);
+    Text1920x1080.setString("1920x1080");
+
+    sf::Text FullScreenText(font);
+    FullScreenText.setString("Full Screen");
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
@@ -93,13 +99,17 @@ int main(){
     sf::RectangleShape PlayButton(PlayText.getGlobalBounds().size);
     sf::RectangleShape ReturnButton(ReturnText.getGlobalBounds().size);
     sf::RectangleShape MainMenuButton(MainMenuText.getGlobalBounds().size);
-    sf::RectangleShape WindowModeButton(WindowModeText.getGlobalBounds().size);
-    sf::CircleShape TriangleUp(20.f, 3);
-    sf::CircleShape TriangleDown(20.f, 3);
-    
-    TriangleDown.setOrigin({TriangleDown.getRadius(),TriangleDown.getRadius()});
-    TriangleDown.rotate(sf::degrees(180));
+    sf::RectangleShape ResolutionModeButton(ResolutionModeText.getGlobalBounds().size);
+    sf::CircleShape WindowModeUp(20.f, 3);
+    sf::CircleShape WindowModeDown(20.f, 3);
+    sf::RectangleShape Text800x600Button(Text800x600.getGlobalBounds().size);
+    sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
+    sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
+
+    WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
+    WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius()});
+    WindowModeDown.rotate(sf::degrees(180));
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Puzzle Piece
@@ -155,9 +165,18 @@ int main(){
     bool isMainMenu = true; // Screen = 0
     bool isOptions = false; // Screen = 1
     bool isPlay = false; // Screen = 2
+    bool isFullScreen = false;
 
     int Screen = 0;
+    
+   
 
+    int ResolutionModes = 0;
+    //800x600:       ResolutionModes = 0
+    //1280x720:      ResolutionModes = 1
+    //1920x1080:     ResolutionModes = 2
+    //FullScreen:    ResolutionModes = 3
+    
     // Get the Previous screen value for the returnButton.
     int PreviousScreen = Screen;
 
@@ -343,13 +362,52 @@ int main(){
         if (isOptions) {
             Screen = 1;
 
-            // FullScreen Button Changes to red when mouse hover.
-            if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+            // Test800x600Button Changes to red when mouse hover.
+            if (Text800x600Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 0) {
+                Text800x600Button.setFillColor(sf::Color::Red);
+
+                // Left click to activate 800x600.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    Game.create(sf::VideoMode({800, 600}), "Options", sf::State::Windowed);
+                }
+            }
+            else {
+                Text800x600Button.setFillColor(sf::Color::Blue);
+            }
+
+            // Text1280x720Button Changes to red when mouse hover.
+            if (Text1280x720Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 1) {
+                Text1280x720Button.setFillColor(sf::Color::Red);
+
+                // Left click to activate Text1280x720Button.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    Game.create(sf::VideoMode({ 1280, 720 }), "Options", sf::State::Windowed);
+                }
+            }
+            else {
+                Text1280x720Button.setFillColor(sf::Color::Blue);
+            }
+
+            // Text1920x1080Button Changes to red when mouse hover.
+            if (Text1920x1080Button.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 2) {
+                Text1920x1080Button.setFillColor(sf::Color::Red);
+
+                // Left click to activate Text1920x1080Button.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    Game.create(sf::VideoMode({ 1920, 1080 }), "Options", sf::State::Windowed);
+                }
+            }
+            else {
+                Text1920x1080Button.setFillColor(sf::Color::Blue);
+            }
+
+            // FullScreenButton Changes to red when mouse hover.
+            if (FullScreenButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true && ResolutionModes % 4 == 3) {
                 FullScreenButton.setFillColor(sf::Color::Red);
 
                 // Left click to activate FullScreenMode.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    Game.create(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
+                    Game.create(sf::VideoMode::getFullscreenModes()[0], "Options", sf::Style::None, sf::State::Fullscreen);
                 }
             }
             else {
@@ -447,17 +505,38 @@ int main(){
                 ReturnButton.setFillColor(sf::Color::Blue);
             }
 
-            // WindowModeButton Changes to red when mouse hover.
-            if (WindowModeButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
-                WindowModeButton.setFillColor(sf::Color::Red);
+            // WindowModeButton is not a button.
+            if (ResolutionModeButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                //Empty
+            }
+            else {
+                ResolutionModeButton.setFillColor(sf::Color::Blue);
+            }
 
-                // Left click to activate FullScreenMode.
+            // WindowModeUp Button Changes to red when mouse hover.
+            if (WindowModeUp.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                WindowModeUp.setFillColor(sf::Color::Red);
+
+                // Left click to activate WindowModeUp.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    //Game.create(sf::VideoMode::getFullscreenModes()[0], "Main Menu", sf::Style::None, sf::State::Fullscreen);
+                    ResolutionModes += 1;
                 }
             }
             else {
-                WindowModeButton.setFillColor(sf::Color::Blue);
+                WindowModeUp.setFillColor(sf::Color::Blue);
+            }
+
+            // WindowModeDown Button Changes to red when mouse hover.
+            if (WindowModeDown.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                WindowModeDown.setFillColor(sf::Color::Red);
+
+                // Left click to activate WindowModeDown.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+                    ResolutionModes -= 1;
+                }
+            }
+            else {
+                WindowModeDown.setFillColor(sf::Color::Blue);
             }
         }
 
@@ -503,11 +582,11 @@ int main(){
         // Transform change the position of Object2 relative to Object1
         sf::Transform transform = Speaker.getTransform();
         sf::Transform transform2 = MusicSymbol.getTransform();
-        sf::Transform transform3 = WindowModeButton.getTransform();
+        sf::Transform transform3 = ResolutionModeButton.getTransform();
 
         // Relative position of the objects. From Object1 to Object2.
         sf::Vector2f relativePosition(300, 90);
-        sf::Vector2f relativePosition2(150, 0);
+        sf::Vector2f relativePosition2(200, 0);
 
         // Apply the transformation to the relative position.
         sf::Vector2f transformedPosition = transform.transformPoint(relativePosition);
@@ -519,7 +598,16 @@ int main(){
         SoundBar.setPosition(transformedPosition);
         MusicBar.setPosition(transformedPosition2);
         MusicBar2.setPosition(transformedPosition2);
-        WindowText.setPosition(transformedPosition3);
+        Text800x600.setPosition(transformedPosition3);
+        Text800x600Button.setPosition(transformedPosition3);
+        Text1280x720.setPosition(transformedPosition3);
+        Text1280x720Button.setPosition(transformedPosition3);
+        Text1920x1080.setPosition(transformedPosition3);
+        Text1920x1080Button.setPosition(transformedPosition3);
+        FullScreenText.setPosition(transformedPosition3);
+        FullScreenButton.setPosition(transformedPosition3);
+
+
 
         // Positions of SoundBar and Volume
         VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
@@ -536,15 +624,18 @@ int main(){
         string MusicVolumeString = to_string(MusicVolume);
         MusicVolumeText.setString(MusicVolumeString);
 
-        //FullScreen does not have a position, because it is position to the origin (top left) by default.
+        // Positions of the TestSound is left at default (top left).
 
-        // Positions of the TestSound.
-        TestSoundText.setPosition({ FullScreenText.getPosition().x, FullScreenText.getPosition().y + 50 });
-        TestSoundButton.setPosition(TestSoundText.getPosition());
+        ResolutionModeText.setPosition({ 100,400 });
+        ResolutionModeButton.setPosition(ResolutionModeText.getPosition());
 
-        WindowModeText.setPosition({ 100,300 });
-        WindowModeButton.setPosition(WindowModeText.getPosition());
+        WindowModeUp.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y });
+        WindowModeDown.setPosition({ ResolutionModeText.getPosition().x + 325, ResolutionModeText.getPosition().y + 40 });
         
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        // Other windows that share buttons.
+        //------------------------------------------------------------------------------------------------------------------------------------------
+
         if (isOptions) {
             ReturnText.setPosition({ CenterX, CenterY + 30});
             ReturnButton.setPosition(ReturnText.getPosition());
@@ -575,14 +666,11 @@ int main(){
         //PreviousText.setString(to_string(PreviousScreen));
         //PreviousText.setPosition({ 300, 300 });
 
-        TriangleUp.setPosition({ 100, CenterY });
-        TriangleDown.setPosition({ 100, CenterY + 50 });
-
         //Order matters when drawing objects.
         Game.clear();
 
-        Game.draw(TriangleUp);
-        Game.draw(TriangleDown);
+
+
 
         if (isMainMenu) {
             Game.draw(QuitButton);
@@ -595,8 +683,6 @@ int main(){
         }
 
         if (isOptions) {
-            Game.draw(FullScreenButton);
-            Game.draw(FullScreenText);
             Game.draw(Speaker);
             Game.draw(SoundBar2);
             Game.draw(SoundBar);
@@ -611,9 +697,30 @@ int main(){
             Game.draw(SoundCircle2);
             Game.draw(ReturnButton);
             Game.draw(ReturnText);
-            Game.draw(WindowModeButton);
-            Game.draw(WindowModeText);
-            Game.draw(WindowText);
+            Game.draw(ResolutionModeButton);
+            Game.draw(ResolutionModeText);
+            Game.draw(WindowModeUp);
+            Game.draw(WindowModeDown);
+
+            if (ResolutionModes % 4 == 0) {
+                Game.draw(Text800x600Button);
+                Game.draw(Text800x600);
+            }
+
+            if (ResolutionModes % 4 == 1) {
+                Game.draw(Text1280x720Button);
+                Game.draw(Text1280x720);
+            }
+
+            if (ResolutionModes % 4 == 2) {
+                Game.draw(Text1920x1080Button);
+                Game.draw(Text1920x1080);
+            }
+
+            if (ResolutionModes % 4 == 3) {
+                Game.draw(FullScreenButton);
+                Game.draw(FullScreenText);
+            }
         }
 
         if (isPlay) {
