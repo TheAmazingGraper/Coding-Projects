@@ -285,6 +285,8 @@ int main() {
     sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
+    sf::RectangleShape SolutionBox({ 300,300 });
+    SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y });
 
 
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
@@ -621,7 +623,7 @@ int main() {
             int black = 0;
             for (int i = static_cast<int>(pieces.size()) - 1; i >= 1; --i) {
                 PuzzlePiece& piece = pieces[i];
-                if (pieces[i].getGlobalBounds().findIntersection(pieces[i - 1].getGlobalBounds())) {
+                if (pieces[i].getGlobalBounds().findIntersection(pieces[i-1].getGlobalBounds())) {
                     pieces[i].setFillColor(sf::Color::Magenta);
                     pieces[i - 1].setFillColor(sf::Color::Magenta);
                     hasCollision = true;
@@ -640,8 +642,6 @@ int main() {
                     LevelComplete == true;
                    
             }
-
-           
             for (int i = 1; i < static_cast<int>(pieces.size()); ++i) {
                 PuzzlePiece& piece1 = pieces[i - 1];
                 PuzzlePiece& piece2 = pieces[i];
@@ -961,7 +961,6 @@ int main() {
 
         SolutionBox.setPosition({ CenterX, CenterY });
         LevelClearText.setPosition({ CenterX,CenterY - 200 });
-        CollisionText.setPosition({ CenterX, CenterY -300});
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -1109,6 +1108,7 @@ int main() {
 
         if (isPlay) {
             backgroundHelper();
+            drawPieces();
             Game.draw(SolutionBox);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
