@@ -285,8 +285,7 @@ int main() {
     sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
-    sf::RectangleShape SolutionBox({ 300,300 });
-    SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y / 2 });
+
 
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
@@ -405,10 +404,17 @@ int main() {
         }
         };
 
-        //pieceMaker({ 0, 1, 2, 3 });
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Levels designs
+    //------------------------------------------------------------------------------------------------------------------------------------------   
+        sf::RectangleShape SolutionBox({ 300,300 });
+        SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y / 2 });
+        
+        //std::vector<Rect> BoxSolutions;
+        pieceMaker({ 0, 1, 2, 3 });
         
         //Level 3:
-        pieceMaker({ 0, 1, 1, 2, 3, 3, 3, 3, 3 });
+        //pieceMaker({ 0, 1, 1, 2, 3, 3, 3, 3, 3 });
 
         //Level 4 :
         //pieceMaker({ 0, 0, 1, 1, 2, 2, 3, 3, 3, 3 });
@@ -452,6 +458,7 @@ int main() {
 
     // Has collisions.
     bool hasCollision = false;
+    bool LevelComplete = false;
 
     // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
     //bool HoldingPiece = false;
@@ -611,6 +618,7 @@ int main() {
             // They will not change color, but it will work eventually.
 
             int pink = 0;
+            int black = 0;
             for (int i = static_cast<int>(pieces.size()) - 1; i >= 1; --i) {
                 PuzzlePiece& piece = pieces[i];
                 if (pieces[i].getGlobalBounds().findIntersection(pieces[i - 1].getGlobalBounds())) {
@@ -624,12 +632,12 @@ int main() {
                 else
                     hasCollision = false;
 
-                
-
                 // When inside boundrary of solution box pieces become black
                 if (SolutionBox.getGlobalBounds().contains(pieces[i].getGlobalBounds().position))
                     pieces[i].setFillColor(sf::Color::Black);
 
+                if (black == pieces.size());
+                    LevelComplete == true;
                    
             }
 
@@ -986,8 +994,6 @@ int main() {
         FullScreenText.setPosition(transformedPosition3);
         FullScreenButton.setPosition(transformedPosition3);
 
-
-
         // Positions of SoundBar and Volume
         VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
         Speaker.setPosition({ CenterX - 200, CenterY });
@@ -1047,9 +1053,6 @@ int main() {
 
         //Order matters when drawing objects.
         Game.clear();
-
-
-
 
         if (isMainMenu) {
             backgroundHelper();
@@ -1111,39 +1114,29 @@ int main() {
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
-
-
-            //if(SolutionBox.getGlobalBounds().findIntersection())
             if(hasCollision)
                 Game.draw(CollisionText);
-            Game.draw(LevelClearText);
+
+            if(LevelComplete)
+                Game.draw(LevelClearText);
             drawPieces();
         }
         Game.display();
 
+        if (LevelComplete) {
+            //Need victory sound
+            ClassLevel.Level += 1;
+            ClassLevel.LevelClear = true;
+        }
 
-        // A level is completed when there is no collision (Magenta blocks).
-        // When all puzzle pieces fits within the boundrary of the Solution box.
-        // When all puzzle pieces are used.
+
+        // A level is completed when there is no collision (Magenta blocks).=============================
+        // When all puzzle pieces fits within the boundrary of the Solution box.(Turns black) =====================
+        // When all puzzle pieces are used.(When all is black I guess)
         // When ... I thinks thats it.
 
 
     }
 }
 
-
-
-
-
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
 
