@@ -308,8 +308,8 @@ int main() {
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sounds
     //------------------------------------------------------------------------------------------------------------------------------------------
-    sf::SoundBuffer buffer("Windows Background.wav");
-    sf::Sound sound(buffer);
+    sf::SoundBuffer buffer("level-win-6416.mp3");
+    sf::Sound victorySound(buffer);
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -407,7 +407,7 @@ int main() {
     //------------------------------------------------------------------------------------------------------------------------------------------   
 
     // stage is refering to the level
-    int stage = 4;
+    int stage = 0;
 
         // Stage 0 doesn't need and if statement, Because it's 0 haha...
         sf::RectangleShape SolutionBox({300,300}); //600
@@ -473,6 +473,8 @@ int main() {
 
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
+
+        LevelComplete = false;
 
         // Holding pieces.
         //HoldingPiece = false;
@@ -638,18 +640,26 @@ int main() {
                 else
                     hasCollision = false;
 
-                // When inside boundrary of solution box pieces become black
-                if (SolutionBox.getGlobalBounds().contains(pieces[i].getGlobalBounds().position))
-                    pieces[i].setFillColor(sf::Color::Black);
 
-                if (black == pieces.size());
-                    LevelComplete = true;
+
+
                    
             }
-            for (int i = 1; i < static_cast<int>(pieces.size()); ++i) {
-                PuzzlePiece& piece1 = pieces[i - 1];
-                PuzzlePiece& piece2 = pieces[i];
+            for (int i = static_cast<int>(pieces.size()) - 1; i >= 0; --i) {
+            
+                // When inside boundrary of solution box pieces become black
+                if (SolutionBox.getGlobalBounds().contains(pieces[i].getGlobalBounds().position)) {
+                    pieces[i].setFillColor(sf::Color::Black);
+                    black++;
+
+                }
+
+
+                if (black == pieces.size() && !hasCollision)
+                    LevelComplete = true;
+
             }
+
 
 
 
@@ -796,7 +806,7 @@ int main() {
                     SoundBar.setSize({ (localPosition.x - SoundBar.getPosition().x), SoundBar.getSize().y });
 
                     // Set the volume of sound.
-                    sound.setVolume(Volume);
+                    victorySound.setVolume(Volume);
                 }
             }
             else {
@@ -810,7 +820,7 @@ int main() {
 
                 // Left click to play test sound.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                    sound.play();
+                    victorySound.play();
                 }
             }
             else {
@@ -1127,13 +1137,24 @@ int main() {
         }
         Game.display();
 
+      
+        sf::Clock clock;
+        sf::Time time = clock.getElapsedTime();
         if (LevelComplete) {
-            //Need victory sound
+            music.setVolume(0);
+            victorySound.setVolume(100);
+            victorySound.play();
             ClassLevel.Level += 1;
             ClassLevel.LevelClear = true;
             stage++;
+            clock.restart();
+            while (time < sf::seconds(4)) {
+                time = clock.getElapsedTime();
+            }
         }
-
+        LevelComplete = false;
+        music.setVolume(MusicVolume);
+        victorySound.setVolume(Volume);
 
         // A level is completed when there is no collision (Magenta blocks).=============================
         // When all puzzle pieces fits within the boundrary of the Solution box.(Turns black) =====================
