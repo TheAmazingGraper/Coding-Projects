@@ -245,6 +245,9 @@ int main() {
     sf::Text CollisionText(font);
     CollisionText.setString("Collision Detected!");
 
+    sf::Text NextLevelText(font);
+    NextLevelText.setString("Next Level");
+
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -284,6 +287,8 @@ int main() {
     sf::RectangleShape Text800x600Button(Text800x600.getGlobalBounds().size);
     sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
+    sf::RectangleShape NextLevelButton(NextLevelText.getGlobalBounds().size);
+
 
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
@@ -417,27 +422,7 @@ int main() {
             pieceMaker({ 0, 1 });
         }
         
-        if (stage == 1) {
-            SolutionBox.setSize({ 100,225 });//325
-            SolutionBox.setPosition({200,200});
-            pieceMaker({ 0, 0, 2,  });
-        }
-        if (stage == 2) {
-            SolutionBox.setSize({ 250,120 });//370
-            SolutionBox.setPosition({ 300,400 });
-            pieceMaker({ 0, 1, 2, 3 });
-        }
-        if (stage == 3) {
-            SolutionBox.setSize({ 200,120 });//320
-            SolutionBox.setPosition({ 100,100 });
-            pieceMaker({ 0, 1, 2, 3, 3 });
 
-        }
-        if (stage == 4) {
-            SolutionBox.setSize({ 235,130 });//365
-            SolutionBox.setPosition({ 100,100 });
-            pieceMaker({ 0, 1, 1, 2, 3 , 0});
-        }
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -640,9 +625,6 @@ int main() {
                 else
                     hasCollision = false;
 
-
-
-
                    
             }
             for (int i = static_cast<int>(pieces.size()) - 1; i >= 0; --i) {
@@ -721,6 +703,43 @@ int main() {
             }
             else {
                 MainMenuButton.setFillColor(sf::Color::Blue);
+            }
+
+            // NextLevelButton Changes to red when mouse hover.
+            if (NextLevelButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
+                NextLevelButton.setFillColor(sf::Color::Red);
+
+                // Left click to activate NextLevelButton.
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && click) {
+                    stage++;
+                    click = false;
+
+                    if (stage == 1) {
+                        SolutionBox.setSize({ 100,225 });//325
+                        SolutionBox.setPosition({ 200,200 });
+                        pieceMaker({ 0, 0, 2, });
+                        Game.clear();
+                    }
+                    if (stage == 2) {
+                        SolutionBox.setSize({ 250,120 });//370
+                        SolutionBox.setPosition({ 300,400 });
+                        pieceMaker({ 0, 1, 2, 3 });
+                    }
+                    if (stage == 3) {
+                        SolutionBox.setSize({ 200,120 });//320
+                        SolutionBox.setPosition({ 100,100 });
+                        pieceMaker({ 0, 1, 2, 3, 3 });
+
+                    }
+                    if (stage == 4) {
+                        SolutionBox.setSize({ 235,130 });//365
+                        SolutionBox.setPosition({ 100,100 });
+                        pieceMaker({ 0, 1, 1, 2, 3 , 0 });
+                    }
+                }
+            }
+            else {
+                NextLevelButton.setFillColor(sf::Color::Blue);
             }
 
         }
@@ -973,8 +992,12 @@ int main() {
         // Puzzle3Bounds.setRotation(piece3.getRotation());
         // Puzzle4Bounds.setRotation(piece4.getRotation());
 
+
         LevelClearText.setPosition({ CenterX,CenterY - 200 });
         CollisionText.setPosition({ CenterX - 100, CenterY - 250 });
+        
+        NextLevelText.setPosition({ 0, 100});
+        NextLevelButton.setPosition(NextLevelText.getPosition());
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -1128,11 +1151,18 @@ int main() {
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
+            Game.draw(NextLevelButton);
+            Game.draw(NextLevelText);
+
             if(hasCollision)
                 Game.draw(CollisionText);
 
-            if(LevelComplete)
+            if (LevelComplete) {
                 Game.draw(LevelClearText);
+            }
+
+
+
             drawPieces();
         }
         Game.display();
@@ -1146,7 +1176,7 @@ int main() {
             victorySound.play();
             ClassLevel.Level += 1;
             ClassLevel.LevelClear = true;
-            stage++;
+            //stage++;
             clock.restart();
             while (time < sf::seconds(4)) {
                 time = clock.getElapsedTime();
@@ -1155,6 +1185,8 @@ int main() {
         LevelComplete = false;
         music.setVolume(MusicVolume);
         victorySound.setVolume(Volume);
+        
+        Game.clear();
 
         // A level is completed when there is no collision (Magenta blocks).=============================
         // When all puzzle pieces fits within the boundrary of the Solution box.(Turns black) =====================
