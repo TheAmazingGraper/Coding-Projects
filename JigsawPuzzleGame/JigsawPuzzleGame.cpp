@@ -4,6 +4,7 @@
 // THIS IS A TEST TO SEE IF DRAKE CAN UPLOAD CODE OR NOT!!!!!!!!
 // How is this not working
 //Added a single comment.
+//Added another comment.
 using namespace std;
 
 #pragma once
@@ -246,7 +247,7 @@ int main() {
     LevelClearText.setString("Level Clear!");
 
     sf::Text CollisionText(font);
-    CollisionText.setString("Collision!");
+    CollisionText.setString("Collision Detected!");
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
@@ -289,7 +290,8 @@ int main() {
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
     sf::RectangleShape SolutionBox({ 300,300 });
-    SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y / 2 });
+    SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y });
+
 
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
@@ -408,10 +410,17 @@ int main() {
         }
         };
 
-        //pieceMaker({ 0, 1, 2, 3 });
+    //------------------------------------------------------------------------------------------------------------------------------------------
+    // Levels designs
+    //------------------------------------------------------------------------------------------------------------------------------------------   
+        sf::RectangleShape SolutionBox({ 300,300 });
+        SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y / 2 });
+        
+        //std::vector<Rect> BoxSolutions;
+        pieceMaker({ 0, 1, 2, 3 });
         
         //Level 3:
-        pieceMaker({ 0, 1, 1, 2, 3, 3, 3, 3, 3 });
+        //pieceMaker({ 0, 1, 1, 2, 3, 3, 3, 3, 3 });
 
         //Level 4 :
         //pieceMaker({ 0, 0, 1, 1, 2, 2, 3, 3, 3, 3 });
@@ -455,6 +464,7 @@ int main() {
 
     // Has collisions.
     bool hasCollision = false;
+    bool LevelComplete = false;
 
     // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
     //bool HoldingPiece = false;
@@ -612,24 +622,30 @@ int main() {
             // P[3] checks for P[2] checks for P[1] checks for P[0]
             // What this means that if a collision occurs with P[3] and P[0]
             // They will not change color, but it will work eventually.
+
+            int pink = 0;
+            int black = 0;
             for (int i = static_cast<int>(pieces.size()) - 1; i >= 1; --i) {
                 PuzzlePiece& piece = pieces[i];
-                if (pieces[i].getGlobalBounds().findIntersection(pieces[i - 1].getGlobalBounds())) {
+                if (pieces[i].getGlobalBounds().findIntersection(pieces[i-1].getGlobalBounds())) {
                     pieces[i].setFillColor(sf::Color::Magenta);
                     pieces[i - 1].setFillColor(sf::Color::Magenta);
                     hasCollision = true;
-                }hasCollision = false;
-                
+                    pink++;
+                }
+                if (pink > 0)
+                    hasCollision = true;
+                else
+                    hasCollision = false;
 
-                
                 // When inside boundrary of solution box pieces become black
                 if (SolutionBox.getGlobalBounds().contains(pieces[i].getGlobalBounds().position))
                     pieces[i].setFillColor(sf::Color::Black);
 
+                if (black == pieces.size());
+                    LevelComplete == true;
                    
             }
-
-           
             for (int i = 1; i < static_cast<int>(pieces.size()); ++i) {
                 PuzzlePiece& piece1 = pieces[i - 1];
                 PuzzlePiece& piece2 = pieces[i];
@@ -949,7 +965,6 @@ int main() {
 
         SolutionBox.setPosition({ CenterX, CenterY });
         LevelClearText.setPosition({ CenterX,CenterY - 200 });
-        CollisionText.setPosition({ CenterX, CenterY -300});
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -981,8 +996,6 @@ int main() {
         Text1920x1080Button.setPosition(transformedPosition3);
         FullScreenText.setPosition(transformedPosition3);
         FullScreenButton.setPosition(transformedPosition3);
-
-
 
         // Positions of SoundBar and Volume
         VolumeText.setPosition({ SoundBar.getPosition().x, SoundBar.getPosition().y - 50 });
@@ -1044,9 +1057,6 @@ int main() {
         //Order matters when drawing objects.
         Game.clear();
 
-
-
-
         if (isMainMenu) {
             backgroundHelper();
             Game.draw(QuitButton);
@@ -1102,44 +1112,35 @@ int main() {
 
         if (isPlay) {
             backgroundHelper();
+            drawPieces();
             Game.draw(SolutionBox);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
-
-
-            //if(SolutionBox.getGlobalBounds().findIntersection())
             if(hasCollision)
                 Game.draw(CollisionText);
-            Game.draw(LevelClearText);
+
+            if(LevelComplete)
+                Game.draw(LevelClearText);
             drawPieces();
         }
         Game.display();
 
+        if (LevelComplete) {
+            //Need victory sound
+            ClassLevel.Level += 1;
+            ClassLevel.LevelClear = true;
+        }
 
-        // A level is completed when there is no collision (Magenta blocks).
-        // When all puzzle pieces fits within the boundrary of the Solution box.
-        // When all puzzle pieces are used.
+
+        // A level is completed when there is no collision (Magenta blocks).=============================
+        // When all puzzle pieces fits within the boundrary of the Solution box.(Turns black) =====================
+        // When all puzzle pieces are used.(When all is black I guess)
         // When ... I thinks thats it.
 
 
     }
 }
 
-
-
-
-
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
 
