@@ -251,9 +251,6 @@ int main() {
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
     //------------------------------------------------------------------------------------------------------------------------------------------
-    //sf::Texture GrapeTexture("Grapes.png");
-    //sf::Sprite Grape(GrapeTexture);
-    //Grape.setColor(sf::Color::Blue);
 
     // Sprite and texture.
     sf::Texture SpeakerTexture("Speaker.png");
@@ -339,47 +336,30 @@ int main() {
     // Puzzle Pieces
     //------------------------------------------------------------------------------------------------------------------------------------------
 
-    //need to create a piece crafter class
-// craft a puzzle piece: (shape, length of side, color)
-//PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
-//piece.setPosition({ 300, 400 });
-//piece.setRotation(NorthAngle);
-//piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
+    std::vector<PuzzlePiece> pieces; // array/list (vector) to hold a list of PuzzlePieces that can be accessed dynamically 
 
-//PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
-//piece2.setPosition({ 400, 400 });
-//piece2.setRotation(NorthAngle);
-//piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
-
-// shape 0 = L
-// shape 1 = T
-// shape 2 = plus
-// shape 3 = minus
-
-    std::vector<PuzzlePiece> pieces;
-
-    std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<int> xDist(100, 200);
-    std::uniform_int_distribution<int> yDist(100, Game.getSize().y);
+    std::mt19937 rng(std::random_device{}());                            //using <random> for greater precision than rand(), but that would work too
+    std::uniform_int_distribution<int> xDist(100, 200);                   // puzzle pieces can spawn on the left of the window between 100 and 200
+    std::uniform_int_distribution<int> yDist(100, Game.getSize().y); // puzzle pieces can spawn (from top to bottom) from 100 to the bottom of the window
     std::uniform_int_distribution<int> angleDist(0, 3);
 
-    auto pieceMaker = [&](const std::vector<int>& shapeIds) {
-        float blockSize = 30;
-        sf::Color color = sf::Color::Blue;
+    auto pieceMaker = [&](const std::vector<int>& shapeIds) { // lambda function to make each piece based on its shapeID and store it in pieces
+        float blockSize = 30; // length of side of small square building blocks. Can be set to a percentage of screen size to resize shapes with window
+        sf::Color color = sf::Color::Blue; // default color
 
         for (int shapeId : shapeIds) {
-            pieces.emplace_back(shapeId, blockSize, color);
-            PuzzlePiece& piece = pieces.back();
+            pieces.emplace_back(shapeId, blockSize, color); // creates a PuzzlePiece and stores it in pieces
+            PuzzlePiece& piece = pieces.back(); // selects the created puzzle piece
 
-            piece.setPosition({
-                static_cast<float>(xDist(rng)),
+            piece.setPosition({         // sets the "spawn" location of each piece.
+                static_cast<float>(xDist(rng)), 
                 static_cast<float>(yDist(rng))
                 });
 
             sf::FloatRect bounds = piece.getGlobalBounds();
-            switch (shapeId) {
+            switch (shapeId) { // switches on shapeID and sets the Origin; values found half mathematically half trial and error
             case 0: // L-shape
-                piece.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 8.f });
+                piece.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 8.f }); 
                 break;
             case 1: // T-shape // -
                 piece.setOrigin({ bounds.size.x / 2.666f, bounds.size.y / 3.f });
@@ -390,9 +370,11 @@ int main() {
             case 3: // minus-shape
                 piece.setOrigin({ bounds.size.x / 4.f, bounds.size.y / 8.f });
                 break;
+              //default:  // need to rewrite this function with Open Closed principle in mind
+                break;
             }
 
-            switch (angleDist(rng)) {
+            switch (angleDist(rng)) { // sets a random angle for the piece to spawn at. Doesn't really matter but for aesthetics.
             case 0: piece.setRotation(NorthAngle); break;
             case 1: piece.setRotation(EastAngle); break;
             case 2: piece.setRotation(SouthAngle); break;
@@ -402,8 +384,8 @@ int main() {
         };
 
     auto drawPieces = [&Game, &pieces]() { // lambda function to draw the background
-        for (const auto& piece : pieces) {
-            Game.draw(piece);
+        for (const auto& piece : pieces) { // for each piece in pieces
+            Game.draw(piece);              // draw it
         }
         };
 
@@ -451,19 +433,11 @@ int main() {
     bool hasCollision = false;
     bool LevelComplete = false;
 
-    // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
-    //bool HoldingPiece = false;
-    //int HoldingPieceNum = 0;
-
 
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
 
         LevelComplete = false;
-
-        // Holding pieces.
-        //HoldingPiece = false;
-        //HoldingPieceNum = 0;
 
         // Volumes of both sound and music. (also convert the float into int)
         int Volume = (int)SoundBar.getSize().x / 3;
@@ -553,8 +527,8 @@ int main() {
             static bool holdingPiece = false;
             static int heldPieceIndex = -1;
 
-            // Reverse iterate to prioritize topmost pieces
-            for (int i = static_cast<int>(pieces.size()) - 1; i >= 0; --i) {
+            
+            for (int i = static_cast<int>(pieces.size()) - 1; i >= 0; --i) { // Reverse iterate to prioritize topmost pieces
                 PuzzlePiece& piece = pieces[i];
 
                 if (!holdingPiece && piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
@@ -596,7 +570,7 @@ int main() {
                     heldPiece.setRotation(EastAngle);
                 }
 
-                // Optional: release on mouse release
+                
                 if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     holdingPiece = false;
                     heldPieceIndex = -1;
@@ -1159,6 +1133,9 @@ int main() {
 
             if (LevelComplete) {
                 Game.draw(LevelClearText);
+            
+
+                pieces.clear();
             }
 
 
