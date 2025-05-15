@@ -352,9 +352,9 @@ int main() {
                 });
 
             sf::FloatRect bounds = piece.getGlobalBounds();
-            switch (shapeId) {
+            switch (shapeId) { // switches on shapeID and sets the Origin; values found half mathematically half trial and error
             case 0: // L-shape
-                piece.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 8.f });
+                piece.setOrigin({ bounds.size.x / 2.f, bounds.size.y / 8.f }); 
                 break;
             case 1: // T-shape // -
                 piece.setOrigin({ bounds.size.x / 2.666f, bounds.size.y / 3.f });
@@ -365,9 +365,11 @@ int main() {
             case 3: // minus-shape
                 piece.setOrigin({ bounds.size.x / 4.f, bounds.size.y / 8.f });
                 break;
+            case default: // need to rewrite this function with Open Closed principle in mind
+                break;
             }
 
-            switch (angleDist(rng)) {
+            switch (angleDist(rng)) { // sets a random angle for the piece to spawn at. Doesn't really matter but for aesthetics.
             case 0: piece.setRotation(NorthAngle); break;
             case 1: piece.setRotation(EastAngle); break;
             case 2: piece.setRotation(SouthAngle); break;
@@ -377,8 +379,8 @@ int main() {
         };
 
     auto drawPieces = [&Game, &pieces]() { // lambda function to draw the background
-        for (const auto& piece : pieces) {
-            Game.draw(piece);
+        for (const auto& piece : pieces) { // for each piece in pieces
+            Game.draw(piece);              // draw it
         }
         };
 
