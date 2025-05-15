@@ -405,32 +405,40 @@ int main() {
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Levels designs
     //------------------------------------------------------------------------------------------------------------------------------------------   
-        sf::RectangleShape SolutionBox({ 300,300 });
-        SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y / 2 });
+
+    // stage is refering to the level
+    int stage = 4;
+
+        // Stage 0 doesn't need and if statement, Because it's 0 haha...
+        sf::RectangleShape SolutionBox({300,300}); //600
+        if (stage == 0) {
+            SolutionBox.setOrigin({ SolutionBox.getPosition().x/2, SolutionBox.getPosition().y/2});
+            SolutionBox.setPosition({ 400, 200 });
+            pieceMaker({ 0, 1 });
+        }
         
-        //std::vector<Rect> BoxSolutions;
-        pieceMaker({ 0, 1, 2, 3 });
-        
-        //Level 3:
-        //pieceMaker({ 0, 1, 1, 2, 3, 3, 3, 3, 3 });
+        if (stage == 1) {
+            SolutionBox.setSize({ 100,225 });//325
+            SolutionBox.setPosition({200,200});
+            pieceMaker({ 0, 0, 2,  });
+        }
+        if (stage == 2) {
+            SolutionBox.setSize({ 250,120 });//370
+            SolutionBox.setPosition({ 300,400 });
+            pieceMaker({ 0, 1, 2, 3 });
+        }
+        if (stage == 3) {
+            SolutionBox.setSize({ 200,120 });//320
+            SolutionBox.setPosition({ 100,100 });
+            pieceMaker({ 0, 1, 2, 3, 3 });
 
-        //Level 4 :
-        //pieceMaker({ 0, 0, 1, 1, 2, 2, 3, 3, 3, 3 });
+        }
+        if (stage == 4) {
+            SolutionBox.setSize({ 235,130 });//365
+            SolutionBox.setPosition({ 100,100 });
+            pieceMaker({ 0, 1, 1, 2, 3 , 0});
+        }
 
-        //Level 5 :
-        //pieceMaker({ 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3 });
-
-        //Level 6 :
-        //pieceMaker({ 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3 });
-
-        //Level 7 :
-        //pieceMaker({ 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 3 });
-
-        //Level 8 :
-        //pieceMaker({ 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3 });
-
-        //Level 9 :
-        //pieceMaker({ 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3 });
 
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Windows types and screens
@@ -635,7 +643,7 @@ int main() {
                     pieces[i].setFillColor(sf::Color::Black);
 
                 if (black == pieces.size());
-                    LevelComplete == true;
+                    LevelComplete = true;
                    
             }
             for (int i = 1; i < static_cast<int>(pieces.size()); ++i) {
@@ -955,8 +963,8 @@ int main() {
         // Puzzle3Bounds.setRotation(piece3.getRotation());
         // Puzzle4Bounds.setRotation(piece4.getRotation());
 
-        SolutionBox.setPosition({ CenterX, CenterY });
         LevelClearText.setPosition({ CenterX,CenterY - 200 });
+        CollisionText.setPosition({ CenterX - 100, CenterY - 250 });
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -1123,6 +1131,7 @@ int main() {
             //Need victory sound
             ClassLevel.Level += 1;
             ClassLevel.LevelClear = true;
+            stage++;
         }
 
 
