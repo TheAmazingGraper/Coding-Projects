@@ -248,9 +248,6 @@ int main() {
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
     //------------------------------------------------------------------------------------------------------------------------------------------
-    //sf::Texture GrapeTexture("Grapes.png");
-    //sf::Sprite Grape(GrapeTexture);
-    //Grape.setColor(sf::Color::Blue);
 
     // Sprite and texture.
     sf::Texture SpeakerTexture("Speaker.png");
@@ -334,40 +331,23 @@ int main() {
     // Puzzle Pieces
     //------------------------------------------------------------------------------------------------------------------------------------------
 
-    //need to create a piece crafter class
-// craft a puzzle piece: (shape, length of side, color)
-//PuzzlePiece piece(1, (Game.getSize().x/20), sf::Color::Blue); // Shape 1 = T
-//piece.setPosition({ 300, 400 });
-//piece.setRotation(NorthAngle);
-//piece.setOrigin({ piece.getGlobalBounds().size.x/3.f, piece.getGlobalBounds().size.y/2.f});
+    std::vector<PuzzlePiece> pieces; // array/list (vector) to hold a list of PuzzlePieces that can be accessed dynamically 
 
-//PuzzlePiece piece2(2, (Game.getSize().x / 20), sf::Color::Blue); // Shape 1 = Plus
-//piece2.setPosition({ 400, 400 });
-//piece2.setRotation(NorthAngle);
-//piece2.setOrigin({ piece2.getGlobalBounds().size.x / 2.f, piece2.getGlobalBounds().size.y / 2.f });
-
-// shape 0 = L
-// shape 1 = T
-// shape 2 = plus
-// shape 3 = minus
-
-    std::vector<PuzzlePiece> pieces;
-
-    std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<int> xDist(100, 200);
-    std::uniform_int_distribution<int> yDist(100, Game.getSize().y);
+    std::mt19937 rng(std::random_device{}());                            //using <random> for greater precision than rand(), but that would work too
+    std::uniform_int_distribution<int> xDist(100, 200);                   // puzzle pieces can spawn on the left of the window between 100 and 200
+    std::uniform_int_distribution<int> yDist(100, Game.getSize().y); // puzzle pieces can spawn (from top to bottom) from 100 to the bottom of the window
     std::uniform_int_distribution<int> angleDist(0, 3);
 
-    auto pieceMaker = [&](const std::vector<int>& shapeIds) {
-        float blockSize = 30;
-        sf::Color color = sf::Color::Blue;
+    auto pieceMaker = [&](const std::vector<int>& shapeIds) { // lambda function to make each piece based on its shapeID and store it in pieces
+        float blockSize = 30; // length of side of small square building blocks. Can be set to a percentage of screen size to resize shapes with window
+        sf::Color color = sf::Color::Blue; // default color
 
         for (int shapeId : shapeIds) {
-            pieces.emplace_back(shapeId, blockSize, color);
-            PuzzlePiece& piece = pieces.back();
+            pieces.emplace_back(shapeId, blockSize, color); // creates a PuzzlePiece and stores it in pieces
+            PuzzlePiece& piece = pieces.back(); // selects the created puzzle piece
 
-            piece.setPosition({
-                static_cast<float>(xDist(rng)),
+            piece.setPosition({         // sets the "spawn" location of each piece.
+                static_cast<float>(xDist(rng)), 
                 static_cast<float>(yDist(rng))
                 });
 
