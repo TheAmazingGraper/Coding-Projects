@@ -1,5 +1,8 @@
 // Jigsaw Puzzle.cpp : This file contains the 'main' function. Program execution begins and ends there.
 // Due Date May 14.
+// Drake, Adam, Nick, Cam
+// THIS IS A TEST TO SEE IF DRAKE CAN UPLOAD CODE OR NOT!!!!!!!!
+// How is this not working
 //Added a single comment.
 using namespace std;
 
@@ -181,8 +184,8 @@ int main() {
         sf::Sprite bgSprite(current);
 
         if (renderFlag);
-            bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
-        
+        bgSprite.setScale(sf::Vector2f(float(Game.getSize().x) / current.getSize().x, float(Game.getSize().y) / current.getSize().y));
+
 
         Game.draw(bgSprite);
         renderFlag = false;
@@ -242,6 +245,9 @@ int main() {
     sf::Text LevelClearText(font);
     LevelClearText.setString("Level Clear!");
 
+    sf::Text CollisionText(font);
+    CollisionText.setString("Collision!");
+
     //------------------------------------------------------------------------------------------------------------------------------------------
     // Sprite Objects
     //------------------------------------------------------------------------------------------------------------------------------------------
@@ -282,8 +288,9 @@ int main() {
     sf::RectangleShape Text1280x720Button(Text1280x720.getGlobalBounds().size);
     sf::RectangleShape Text1920x1080Button(Text1920x1080.getGlobalBounds().size);
 
-    sf::RectangleShape SolutionBox({ 30,30 });
-    sf::FloatRect Checker;
+    sf::RectangleShape SolutionBox({ 300,300 });
+    SolutionBox.setOrigin({ SolutionBox.getPosition().x / 2, SolutionBox.getPosition().y / 2 });
+
     WindowModeUp.setOrigin({ WindowModeUp.getRadius(), WindowModeUp.getRadius() });
     WindowModeDown.setOrigin({ WindowModeDown.getRadius(),WindowModeDown.getRadius() });
     WindowModeDown.rotate(sf::degrees(180));
@@ -401,12 +408,32 @@ int main() {
         }
         };
 
-    pieceMaker({ 0, 1, 2, 3 });
+    //pieceMaker({ 0, 1, 2, 3 });
 
+    //Level 3:
+    pieceMaker({ 0, 1, 1, 2, 3, 3, 3, 3, 3 });
 
-    //------------------------------------------------------------------------------------------------------------------------------------------
-    // Windows types and screens
-    //------------------------------------------------------------------------------------------------------------------------------------------    
+    //Level 4 :
+    //pieceMaker({ 0, 0, 1, 1, 2, 2, 3, 3, 3, 3 });
+
+    //Level 5 :
+    //pieceMaker({ 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3 });
+
+    //Level 6 :
+    //pieceMaker({ 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3 });
+
+    //Level 7 :
+    //pieceMaker({ 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 3 });
+
+    //Level 8 :
+    //pieceMaker({ 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3 });
+
+    //Level 9 :
+    //pieceMaker({ 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3 });
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+// Windows types and screens
+//------------------------------------------------------------------------------------------------------------------------------------------    
     bool isMainMenu = true; // Screen = 0
     bool isOptions = false; // Screen = 1
     bool isPlay = false; // Screen = 2
@@ -425,6 +452,9 @@ int main() {
 
     // Single Mouse click
     bool click = true;
+
+    // Has collisions.
+    bool hasCollision = false;
 
     // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
     //bool HoldingPiece = false;
@@ -576,6 +606,35 @@ int main() {
                 }
 
             }
+
+            // Loop that iterates the puzzle pieces, and change color to Magenta if a collison occurs.
+            // Note: This only checks for a piece next in line of the iterations.
+            // P[3] checks for P[2] checks for P[1] checks for P[0]
+            // What this means that if a collision occurs with P[3] and P[0]
+            // They will not change color, but it will work eventually.
+            for (int i = static_cast<int>(pieces.size()) - 1; i >= 1; --i) {
+                PuzzlePiece& piece = pieces[i];
+                if (pieces[i].getGlobalBounds().findIntersection(pieces[i - 1].getGlobalBounds())) {
+                    pieces[i].setFillColor(sf::Color::Magenta);
+                    pieces[i - 1].setFillColor(sf::Color::Magenta);
+                    hasCollision = true;
+                }hasCollision = false;
+
+
+
+                // When inside boundrary of solution box pieces become black
+                if (SolutionBox.getGlobalBounds().contains(pieces[i].getGlobalBounds().position))
+                    pieces[i].setFillColor(sf::Color::Black);
+
+
+            }
+
+
+            for (int i = 1; i < static_cast<int>(pieces.size()); ++i) {
+                PuzzlePiece& piece1 = pieces[i - 1];
+                PuzzlePiece& piece2 = pieces[i];
+            }
+
 
 
             // OptionsButton Changes to red when mouse hover.
@@ -890,6 +949,7 @@ int main() {
 
         SolutionBox.setPosition({ CenterX, CenterY });
         LevelClearText.setPosition({ CenterX,CenterY - 200 });
+        CollisionText.setPosition({ CenterX, CenterY - 300 });
 
         //------------------------------------------------------------------------------------------------------------------------------------------
         // Positions of Options objects.
@@ -1042,18 +1102,28 @@ int main() {
 
         if (isPlay) {
             backgroundHelper();
-            drawPieces();
             Game.draw(SolutionBox);
             Game.draw(OptionsButton);
             Game.draw(OptionsText);
             Game.draw(MainMenuButton);
             Game.draw(MainMenuText);
 
-            //if (SolutionBox.getGlobalBounds().findIntersection(piece.getGlobalBounds()) && SolutionBox.getSize() == piece.getBlockSize())
-            Game.draw(LevelClearText);
 
+            //if(SolutionBox.getGlobalBounds().findIntersection())
+            if (hasCollision)
+                Game.draw(CollisionText);
+            Game.draw(LevelClearText);
+            drawPieces();
         }
         Game.display();
+
+
+        // A level is completed when there is no collision (Magenta blocks).
+        // When all puzzle pieces fits within the boundrary of the Solution box.
+        // When all puzzle pieces are used.
+        // When ... I thinks thats it.
+
+
     }
 }
 
@@ -1072,4 +1142,3 @@ int main() {
 //   4. Use the Error List window to view errors
 //   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
 //   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
-
