@@ -448,19 +448,11 @@ int main() {
     bool hasCollision = false;
     bool LevelComplete = false;
 
-    // Holding pieces. This allows for a singular puzzle piece to be pick up one at a time.
-    //bool HoldingPiece = false;
-    //int HoldingPieceNum = 0;
-
 
     // Run the program as long as the game window is open.
     while (Game.isOpen()) {
 
         LevelComplete = false;
-
-        // Holding pieces.
-        //HoldingPiece = false;
-        //HoldingPieceNum = 0;
 
         // Volumes of both sound and music. (also convert the float into int)
         int Volume = (int)SoundBar.getSize().x / 3;
@@ -550,8 +542,8 @@ int main() {
             static bool holdingPiece = false;
             static int heldPieceIndex = -1;
 
-            // Reverse iterate to prioritize topmost pieces
-            for (int i = static_cast<int>(pieces.size()) - 1; i >= 0; --i) {
+            
+            for (int i = static_cast<int>(pieces.size()) - 1; i >= 0; --i) { // Reverse iterate to prioritize topmost pieces
                 PuzzlePiece& piece = pieces[i];
 
                 if (!holdingPiece && piece.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y })) {
@@ -593,7 +585,7 @@ int main() {
                     heldPiece.setRotation(EastAngle);
                 }
 
-                // Optional: release on mouse release
+                
                 if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
                     holdingPiece = false;
                     heldPieceIndex = -1;
@@ -944,16 +936,6 @@ int main() {
 
         MainMenuText.setPosition({ 0, 0 });
         MainMenuButton.setPosition(MainMenuText.getPosition());
-
-        // Puzzle1Bounds.setPosition(piece.getPosition());
-        // Puzzle2Bounds.setPosition(piece2.getPosition());
-        // Puzzle3Bounds.setPosition(piece3.getPosition());
-        // Puzzle4Bounds.setPosition(piece4.getPosition());
-
-        // Puzzle1Bounds.setRotation(piece.getRotation());
-        // Puzzle2Bounds.setRotation(piece2.getRotation());
-        // Puzzle3Bounds.setRotation(piece3.getRotation());
-        // Puzzle4Bounds.setRotation(piece4.getRotation());
 
         LevelClearText.setPosition({ CenterX,CenterY - 200 });
         CollisionText.setPosition({ CenterX - 100, CenterY - 250 });
