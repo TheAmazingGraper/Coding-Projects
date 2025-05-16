@@ -20,7 +20,7 @@ using namespace std;
 class PuzzlePiece : public sf::Drawable, public sf::Transformable {
 public:
 
-
+    
     static const std::vector<sf::Vector2i> L;
     static const std::vector<sf::Vector2i> T;
     static const std::vector<sf::Vector2i> plus;
@@ -683,9 +683,11 @@ int main() {
             if (NextLevelButton.getGlobalBounds().contains({ (float)localPosition.x, (float)localPosition.y }) == true) {
                 NextLevelButton.setFillColor(sf::Color::Red);
 
+
                 // Left click to activate NextLevelButton.
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && click) {
                     stage++;
+                    pieces.clear();
                     click = false;
 
                     if (stage == 1) {
